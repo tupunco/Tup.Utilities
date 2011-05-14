@@ -1,17 +1,17 @@
-using System;
+ï»¿using System;
 using System.IO;
 using System.Xml.Serialization;
 
 namespace Tup.Utilities
 {
     /// <summary>
-    /// XML ĞòÁĞ»¯ ÖúÊÖ
+    /// XML åºåˆ—åŒ– åŠ©æ‰‹
     /// </summary>
     public static class XmlSerializeHelper
     {
-        #region ¾²Ì¬·½·¨
+        #region é™æ€æ–¹æ³•
         /// <summary>
-        /// XML ĞòÁĞ»¯Ä³Ò»ÀàĞÍ¶ÔÏóµ½Ö¸¶¨µÄÎÄ¼ş
+        /// XML åºåˆ—åŒ–æŸä¸€ç±»å‹å¯¹è±¡åˆ°æŒ‡å®šçš„æ–‡ä»¶
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filePath"></param>
@@ -32,10 +32,10 @@ namespace Tup.Utilities
             }
         }
         /// <summary>
-        /// ´ÓÄ³Ò» XML ÎÄ¼ş·´ĞòÁĞ»¯µ½Ä³Ò»ÀàĞÍ¶ÔÏó
+        /// ä»æŸä¸€ XML æ–‡ä»¶ååºåˆ—åŒ–åˆ°æŸä¸€ç±»å‹å¯¹è±¡
         /// </summary>
-        /// <param name="filePath">´ı·´ĞòÁĞ»¯µÄ XML ÎÄ¼şÃû³Æ</param>
-        /// <param name="type">·´ĞòÁĞ»¯³öµÄ</param>
+        /// <param name="filePath">å¾…ååºåˆ—åŒ–çš„ XML æ–‡ä»¶åç§°</param>
+        /// <param name="type">ååºåˆ—åŒ–å‡ºçš„</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">filePath arg is null</exception>
         public static T DeserializeFromXml<T>(string filePath)

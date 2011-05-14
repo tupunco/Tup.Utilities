@@ -1,28 +1,28 @@
-Ò»×é C# ¹¤¾ßÖúÊÖÀà(C # tools a set of helper classes)
+ï»¿ä¸€ç»„ C# å·¥å…·åŠ©æ‰‹ç±»(C # tools a set of helper classes)
 ===============
 
-Ä¿Ç°°üÀ¨ÖúÊÖÀà(Currently includes): 
+ç›®å‰åŒ…æ‹¬åŠ©æ‰‹ç±»(Currently includes): 
 ---------------------------------
 
-* RequestHelper: [HttpRequest](http://msdn.microsoft.com/en-us/library/system.net.httpwebrequest(v=vs.80).aspx)ÖúÊÖ(HttpWebRequest helper)
+* RequestHelper: [HttpRequest](http://msdn.microsoft.com/en-us/library/system.net.httpwebrequest(v=vs.80).aspx)åŠ©æ‰‹(HttpWebRequest helper)
 
-	Ö§³Ö GET/POST ÏÂÔØ HTML »òÕß Stream Êı¾İ
+	æ”¯æŒ GET/POST ä¸‹è½½ HTML æˆ–è€… Stream æ•°æ®
 
-* XmlSerializeHelper: .NET ĞòÁĞ»¯·´ĞòÁĞ»¯ÖúÊÖ(.NET XML Serialization Deserialization helper);
-* LogHelper: Log4Net(http://logging.apache.org/log4net/index.html) ÈÕÖ¾ÖúÊÖ(Log4Net log helper)
-* WebProxyHelper: HTTP ´úÀí²Ù×÷ÖúÊÖ(HTTP proxy operations helper)
+* XmlSerializeHelper: .NET åºåˆ—åŒ–ååºåˆ—åŒ–åŠ©æ‰‹(.NET XML Serialization Deserialization helper);
+* LogHelper: Log4Net(http://logging.apache.org/log4net/index.html) æ—¥å¿—åŠ©æ‰‹(Log4Net log helper)
+* WebProxyHelper: HTTP ä»£ç†æ“ä½œåŠ©æ‰‹(HTTP proxy operations helper)
 
-	- ×Ô¶¯ÏÂÔØ´úÀí IP
-	- ´úÀí IP ½¡¿µ¼ì²é
+	- è‡ªåŠ¨ä¸‹è½½ä»£ç† IP
+	- ä»£ç† IP å¥åº·æ£€æŸ¥
 
 
 
-ÆäËû(Other):
+å…¶ä»–(Other):
 -----------
 
-* ±¾Àà¿âÊ¹ÓÃµ½ [DLR](http://dlr.codeplex.com/license) ²¿·ÖÀà.
+* æœ¬ç±»åº“ä½¿ç”¨åˆ° [DLR](http://dlr.codeplex.com/license) éƒ¨åˆ†ç±».
 
-ÁªÏµ(Contact):
+è”ç³»(Contact):
 -------------
 TUPUNCO
 <tupunco@163.com>

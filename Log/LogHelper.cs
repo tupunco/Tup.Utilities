@@ -1,12 +1,12 @@
-using System;
+ï»¿using System;
 
 using log4net;
 
 namespace Tup.Utilities
 {
     /// <summary>
-    /// ÈÕÖ¾´¦Àí ÖúÊÖ
-    /// Log4net²âÊÔ-Log4netÊ¹ÓÃ·â×°Àà
+    /// æ—¥å¿—å¤„ç† åŠ©æ‰‹
+    /// Log4netæµ‹è¯•-Log4netä½¿ç”¨å°è£…ç±»
     /// </summary>
     /// <remarks>
     /// http://zhq.ahau.edu.cn/blog/article.asp?id=366
@@ -17,9 +17,9 @@ namespace Tup.Utilities
         private readonly static ILog m_log = log4net.LogManager.GetLogger(typeof(object));
 
         /// <summary>
-        /// ³õÊ¼»¯ÈÕÖ¾ÏµÍ³
-        /// ÔÚÏµÍ³ÔËĞĞ¿ªÊ¼³õÊ¼»¯
-        /// Global.asax Application_StartÄÚ
+        /// åˆå§‹åŒ–æ—¥å¿—ç³»ç»Ÿ
+        /// åœ¨ç³»ç»Ÿè¿è¡Œå¼€å§‹åˆå§‹åŒ–
+        /// Global.asax Application_Startå†…
         /// </summary>
         public static void Init()
         {
@@ -27,20 +27,20 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// Ğ´ÈëÈÕÖ¾
+        /// å†™å…¥æ—¥å¿—
         /// </summary>
-        /// <param name="message">ÈÕÖ¾ĞÅÏ¢</param>
-        /// <param name="messageType">ÈÕÖ¾ÀàĞÍ</param>
+        /// <param name="message">æ—¥å¿—ä¿¡æ¯</param>
+        /// <param name="messageType">æ—¥å¿—ç±»å‹</param>
         public static void Write(string message, LogMessageType messageType)
         {
             DoLog(message, messageType, null, Type.GetType("System.Object"));
         }
 
         /// <summary>
-        /// Ğ´ÈëÈÕÖ¾
+        /// å†™å…¥æ—¥å¿—
         /// </summary>
-        /// <param name="message">ÈÕÖ¾ĞÅÏ¢</param>
-        /// <param name="messageType">ÈÕÖ¾ÀàĞÍ</param>
+        /// <param name="message">æ—¥å¿—ä¿¡æ¯</param>
+        /// <param name="messageType">æ—¥å¿—ç±»å‹</param>
         /// <param name="type"></param>
         public static void Write(string message, LogMessageType messageType, Type type)
         {
@@ -48,22 +48,22 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// Ğ´ÈëÈÕÖ¾
+        /// å†™å…¥æ—¥å¿—
         /// </summary>
-        /// <param name="message">ÈÕÖ¾ĞÅÏ¢</param>
-        /// <param name="messageType">ÈÕÖ¾ÀàĞÍ</param>
-        /// <param name="ex">Òì³£</param>
+        /// <param name="message">æ—¥å¿—ä¿¡æ¯</param>
+        /// <param name="messageType">æ—¥å¿—ç±»å‹</param>
+        /// <param name="ex">å¼‚å¸¸</param>
         public static void Write(string message, LogMessageType messageType, Exception ex)
         {
             DoLog(message, messageType, ex, Type.GetType("System.Object"));
         }
 
         /// <summary>
-        /// Ğ´ÈëÈÕÖ¾
+        /// å†™å…¥æ—¥å¿—
         /// </summary>
-        /// <param name="message">ÈÕÖ¾ĞÅÏ¢</param>
-        /// <param name="messageType">ÈÕÖ¾ÀàĞÍ</param>
-        /// <param name="ex">Òì³£</param>
+        /// <param name="message">æ—¥å¿—ä¿¡æ¯</param>
+        /// <param name="messageType">æ—¥å¿—ç±»å‹</param>
+        /// <param name="ex">å¼‚å¸¸</param>
         /// <param name="type"></param>
         public static void Write(string message, LogMessageType messageType, Exception ex,
                                  Type type)
@@ -72,21 +72,21 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// ¶ÏÑÔ
+        /// æ–­è¨€
         /// </summary>
-        /// <param name="condition">Ìõ¼ş</param>
-        /// <param name="message">ÈÕÖ¾ĞÅÏ¢</param>
+        /// <param name="condition">æ¡ä»¶</param>
+        /// <param name="message">æ—¥å¿—ä¿¡æ¯</param>
         public static void Assert(bool condition, string message)
         {
             Assert(condition, message, Type.GetType("System.Object"));
         }
 
         /// <summary>
-        /// ¶ÏÑÔ
+        /// æ–­è¨€
         /// </summary>
-        /// <param name="condition">Ìõ¼ş</param>
-        /// <param name="message">ÈÕÖ¾ĞÅÏ¢</param>
-        /// <param name="type">ÈÕÖ¾ÀàĞÍ</param>
+        /// <param name="condition">æ¡ä»¶</param>
+        /// <param name="message">æ—¥å¿—ä¿¡æ¯</param>
+        /// <param name="type">æ—¥å¿—ç±»å‹</param>
         public static void Assert(bool condition, string message, Type type)
         {
             if (condition == false)
@@ -94,12 +94,12 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// ±£´æÈÕÖ¾
+        /// ä¿å­˜æ—¥å¿—
         /// </summary>
-        /// <param name="message">ÈÕÖ¾ĞÅÏ¢</param>
-        /// <param name="messageType">ÈÕÖ¾ÀàĞÍ</param>
-        /// <param name="ex">Òì³£</param>
-        /// <param name="type">ÈÕÖ¾ÀàĞÍ</param>
+        /// <param name="message">æ—¥å¿—ä¿¡æ¯</param>
+        /// <param name="messageType">æ—¥å¿—ç±»å‹</param>
+        /// <param name="ex">å¼‚å¸¸</param>
+        /// <param name="type">æ—¥å¿—ç±»å‹</param>
         private static void DoLog(string message, LogMessageType messageType, Exception ex,
                                   Type type)
         {
@@ -128,28 +128,28 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// ÈÕÖ¾ÀàĞÍ
+        /// æ—¥å¿—ç±»å‹
         /// </summary>
         public enum LogMessageType
         {
             /// <summary>
-            /// µ÷ÊÔ
+            /// è°ƒè¯•
             /// </summary>
             Debug,
             /// <summary>
-            /// ĞÅÏ¢
+            /// ä¿¡æ¯
             /// </summary>
             Info,
             /// <summary>
-            /// ¾¯¸æ
+            /// è­¦å‘Š
             /// </summary>
             Warn,
             /// <summary>
-            /// ´íÎó
+            /// é”™è¯¯
             /// </summary>
             Error,
             /// <summary>
-            /// ÖÂÃü´íÎó
+            /// è‡´å‘½é”™è¯¯
             /// </summary>
             Fatal
         }
