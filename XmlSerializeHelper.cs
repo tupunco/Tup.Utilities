@@ -10,6 +10,7 @@ namespace Tup.Utilities
     public static class XmlSerializeHelper
     {
         #region 静态方法
+
         /// <summary>
         /// XML 序列化某一类型对象到指定的文件
         /// </summary>
@@ -31,6 +32,7 @@ namespace Tup.Utilities
                 xs.Serialize(writer, obj);
             }
         }
+
         /// <summary>
         /// 从某一 XML 文件反序列化到某一类型对象
         /// </summary>
@@ -51,6 +53,7 @@ namespace Tup.Utilities
                 return (T)xs.Deserialize(reader);
             }
         }
-        #endregion
+
+        #endregion 静态方法
     }
 }

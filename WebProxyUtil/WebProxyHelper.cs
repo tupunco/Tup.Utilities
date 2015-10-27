@@ -15,16 +15,19 @@ namespace Tup.Utilities.WebProxyUtil
         /// 代理配置文件保存文件
         /// </summary>
         private static readonly string s_Config_ProxyIPConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ProxyIPConfig.xml");
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private static List<ProxyIPNode> _webProxyIPList;
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        readonly static Random _sysRandom = new Random();
+        private static readonly Random _sysRandom = new Random();
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         static WebProxyHelper()
         {
@@ -33,13 +36,14 @@ namespace Tup.Utilities.WebProxyUtil
             else
                 _webProxyIPList = null;
         }
+
         /// <summary>
         /// 强制过期某代理
         /// </summary>
         /// <param name="cProxyNode"></param>
         public static void ForcedExpiration(WebProxy cProxy)
         {
-            if (cProxy == null) 
+            if (cProxy == null)
                 return;
 
             var cProxyNode = new ProxyIPNode()
@@ -50,6 +54,7 @@ namespace Tup.Utilities.WebProxyUtil
             cProxyNode.CanUse = false;
             _webProxyIPList.Remove(cProxyNode);
         }
+
         /// <summary>
         /// 获得一个Web代理
         /// </summary>
@@ -149,6 +154,7 @@ namespace Tup.Utilities.WebProxyUtil
             }
             return oList.Count == 0 ? null : oList;
         }
+
         /// <summary>
         /// 重新下载 代理列表
         /// </summary>

@@ -6,6 +6,7 @@ using System.Threading;
 
 namespace Tup.Utilities
 {
+#if NET_2
     /// <summary>
     /// A simple hashset, built on Dictionary{K, V}
     /// </summary>
@@ -106,4 +107,5 @@ namespace Tup.Utilities
             return new List<T>(_data.Keys);
         }
     }
+#endif
 }

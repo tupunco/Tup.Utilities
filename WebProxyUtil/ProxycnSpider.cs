@@ -6,15 +6,16 @@ namespace Tup.Utilities.WebProxyUtil
 {
     /// <summary>
     /// Proxycn 代理中国 HTTP 代理列表 下载器
-    /// 全文页面: 
+    /// 全文页面:
     ///    首 http://www.proxycn.com/html_proxy/http-1.html
     ///    末 http://www.proxycn.com/html_proxy/http-62.html
     /// </summary>
     public class ProxycnSpider : AbstractSpider
     {
-        string pageFormat = @"http://www.proxycn.com/html_proxy/http-{0}.html";
+        private string pageFormat = @"http://www.proxycn.com/html_proxy/http-{0}.html";
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public ProxycnSpider()
         {
@@ -25,6 +26,7 @@ namespace Tup.Utilities.WebProxyUtil
                 PageEncoding = System.Text.Encoding.GetEncoding("GB2312")
             };
         }
+
         /// <summary>
         /// 处理
         /// </summary>
@@ -43,6 +45,7 @@ namespace Tup.Utilities.WebProxyUtil
                     HtmlAnalyse(downLoadHtml);
             }
         }
+
         /// <summary>
         /// 分析
         /// </summary>
@@ -71,6 +74,7 @@ namespace Tup.Utilities.WebProxyUtil
                 match = match.NextMatch();
             }
         }
-        const string REGEX_PATTERN = @"<TD\s+class=""list"">\s*(?<p>[^<]*)</TD>\s*<TD\s+class=""list"">[^<]*</TD>\s*<TD\s+class=""list"">[^<]*</TD>\s*<TD\s+class=""list"">[^<]*</TD>\s*<TD\s+class=""list"">\s*(?<t>[^<]*)</TD>\s*<TD\s+class=""list"">\s*<a\s+href=whois\.php\?whois=(?<ip>\d+\.\d+\.\d+\.\d+)\s+target=_blank>\s*whois\s*</TD>\s*</TR>";
+
+        private const string REGEX_PATTERN = @"<TD\s+class=""list"">\s*(?<p>[^<]*)</TD>\s*<TD\s+class=""list"">[^<]*</TD>\s*<TD\s+class=""list"">[^<]*</TD>\s*<TD\s+class=""list"">[^<]*</TD>\s*<TD\s+class=""list"">\s*(?<t>[^<]*)</TD>\s*<TD\s+class=""list"">\s*<a\s+href=whois\.php\?whois=(?<ip>\d+\.\d+\.\d+\.\d+)\s+target=_blank>\s*whois\s*</TD>\s*</TR>";
     }
 }

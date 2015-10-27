@@ -15,8 +15,11 @@ namespace Tup.Utilities
             //初始化 Log4Net
             LogHelper.Init();
         }
+
         public static LogManager Instance = new LogManager();
+
         #region Debug Log(调试模式有效)
+
         /// <summary>
         /// Debug Log(调试模式有效)
         /// </summary>
@@ -26,6 +29,7 @@ namespace Tup.Utilities
         {
             LogHelper.Write(msg, LogHelper.LogMessageType.Debug);
         }
+
         /// <summary>
         /// Debug Log(调试模式有效)
         /// </summary>
@@ -35,8 +39,11 @@ namespace Tup.Utilities
         {
             Debug(string.Format(format, msgs));
         }
-        #endregion
+
+        #endregion Debug Log(调试模式有效)
+
         #region Error Log
+
         /// <summary>
         /// Error Log
         /// </summary>
@@ -45,6 +52,7 @@ namespace Tup.Utilities
         {
             LogHelper.Write(msg, LogHelper.LogMessageType.Error);
         }
+
         /// <summary>
         /// Error Log
         /// </summary>
@@ -53,8 +61,11 @@ namespace Tup.Utilities
         {
             Error(string.Format(format, msgs));
         }
-        #endregion
+
+        #endregion Error Log
+
         #region Info Log
+
         /// <summary>
         /// Info Log
         /// </summary>
@@ -63,6 +74,7 @@ namespace Tup.Utilities
         {
             LogHelper.Write(msg, LogHelper.LogMessageType.Info);
         }
+
         /// <summary>
         /// Info Log
         /// </summary>
@@ -71,8 +83,11 @@ namespace Tup.Utilities
         {
             Info(string.Format(format, msgs));
         }
-        #endregion
+
+        #endregion Info Log
+
         #region Fatal Log
+
         /// <summary>
         /// Fatal Log
         /// </summary>
@@ -81,6 +96,7 @@ namespace Tup.Utilities
         {
             LogHelper.Write(msg, LogHelper.LogMessageType.Fatal);
         }
+
         /// <summary>
         /// Fatal Log
         /// </summary>
@@ -89,6 +105,7 @@ namespace Tup.Utilities
         {
             Fatal(string.Format(format, msgs));
         }
-        #endregion
+
+        #endregion Fatal Log
     }
 }

@@ -13,10 +13,12 @@ namespace Tup.Utilities.WebProxyUtil
         /// 抓取开始页码
         /// </summary>
         public int BeginPageNumber { set; get; }
+
         /// <summary>
         /// 抓取结束页码
         /// </summary>
         public int EndPageNumber { set; get; }
+
         /// <summary>
         /// URL 地址索引
         /// </summary>
@@ -35,20 +37,24 @@ namespace Tup.Utilities.WebProxyUtil
                                     ResultArticleList.ConvertAll<string>(x => string.Format(@"""{0}"",""{1}""", x.IP, x.Port)).ToArray());
             }
         }
+
         /// <summary>
         /// 输出日志
         /// </summary>
         /// <param name="msg"></param>
         public void WL(string msg) { Console.WriteLine(msg); }
+
         /// <summary>
         /// 处理
         /// </summary>
         protected abstract void Process();
+
         /// <summary>
         /// 分析
         /// </summary>
         /// <param name="html"></param>
         protected abstract void HtmlAnalyse(string html);
+
         /// <summary>
         /// 下载
         /// </summary>
@@ -64,6 +70,7 @@ namespace Tup.Utilities.WebProxyUtil
 
             return RequestHelper.DownLoadHtml(url, null, Site.PageEncoding, null);
         }
+
         /// <summary>
         /// Try to string Trim
         /// </summary>
@@ -73,10 +80,12 @@ namespace Tup.Utilities.WebProxyUtil
         {
             if (string.IsNullOrEmpty(str))
                 return str;
-            
+
             return str.Trim();
         }
+
         private List<ProxyIPNode> _ResultArticleList;
+
         /// <summary>
         /// 结果数据
         /// </summary>
@@ -96,12 +105,14 @@ namespace Tup.Utilities.WebProxyUtil
                 _ResultArticleList = value;
             }
         }
+
         /// <summary>
         /// 当前操作站点
         /// </summary>
         public SiteEntity Site { get; protected set; }
 
         private double _sleepTime = 0.1;
+
         /// <summary>
         /// 休眠秒数 默认 0.1
         /// </summary>
@@ -111,6 +122,7 @@ namespace Tup.Utilities.WebProxyUtil
             set { _sleepTime = value; }
         }
     }
+
     /// <summary>
     /// 操作站点
     /// </summary>
@@ -120,11 +132,14 @@ namespace Tup.Utilities.WebProxyUtil
         /// 站点URL
         /// </summary>
         public string Url { get; set; }
+
         /// <summary>
         /// 站点名
         /// </summary>
         public string Name { set; get; }
+
         private System.Text.Encoding _PageEncoding;
+
         /// <summary>
         /// 站点页面编码
         /// </summary>
