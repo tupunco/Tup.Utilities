@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-
-namespace Tup.Utilities
+﻿namespace Tup.Utilities
 {
 #if NET_2
     /// <summary>

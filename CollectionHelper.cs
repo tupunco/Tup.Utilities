@@ -4,12 +4,12 @@ using System.Collections.Generic;
 namespace Tup.Utilities
 {
     /// <summary>
-    /// 集合处理 工具类
+    ///     集合处理 工具类
     /// </summary>
     public static class CollectionHelper
     {
         /// <summary>
-        /// Set ToList
+        ///     Set ToList
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="input"></param>
@@ -25,7 +25,7 @@ namespace Tup.Utilities
         #region IsEmpty
 
         /// <summary>
-        /// 指示指定类型的 数组对象是 null 或者 Length = 0。
+        ///     指示指定类型的 数组对象是 null 或者 Length = 0。
         /// </summary>
         /// <param name="input">array to check</param>
         /// <returns>bool</returns>
@@ -35,7 +35,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// 指示指定类型的 数组对象是 null 或者 Length = 0。
+        ///     指示指定类型的 数组对象是 null 或者 Length = 0。
         /// </summary>
         /// <param name="input">array to check</param>
         /// <returns>bool</returns>
@@ -49,7 +49,7 @@ namespace Tup.Utilities
         #region AddRange
 
         /// <summary>
-        /// AddRange ICollection
+        ///     AddRange ICollection
         /// </summary>
         /// <param name="collection"></param>
         /// <param name="addCollection"></param>
@@ -65,11 +65,12 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// AddRange IDictionary
+        ///     AddRange IDictionary
         /// </summary>
         /// <param name="collection"></param>
         /// <param name="addCollection"></param>
-        public static void AddRange<TKey, TValue>(this IDictionary<TKey, TValue> collection, IDictionary<TKey, TValue> addCollection)
+        public static void AddRange<TKey, TValue>(this IDictionary<TKey, TValue> collection,
+                                                  IDictionary<TKey, TValue> addCollection)
         {
             if (collection == null || addCollection == null)
                 return;
@@ -81,15 +82,15 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// AddRange ICollection
+        ///     AddRange ICollection
         /// </summary>
         /// <param name="collection"></param>
         /// <param name="addCollection"></param>
         /// <param name="startIndex"></param>
         /// <param name="count"></param>
         public static void AddRange<TInput>(this ICollection<TInput> collection,
-                                                IEnumerable<TInput> addCollection,
-                                                int startIndex, int count)
+                                            IEnumerable<TInput> addCollection,
+                                            int startIndex, int count)
         {
             if (collection == null || addCollection == null || count <= 0)
                 return;
@@ -111,10 +112,10 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// AddRange To Queue
+        ///     AddRange To Queue
         /// </summary>
         /// <param name="collection"></param>
-        /// <param name="collection"></param>
+        /// <param name="addCollection"></param>
         public static void AddRange<TInput>(this Queue<TInput> collection, IEnumerable<TInput> addCollection)
         {
             if (collection == null || addCollection == null)
@@ -127,10 +128,10 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// AddRange To Stack
+        ///     AddRange To Stack
         /// </summary>
         /// <param name="collection"></param>
-        /// <param name="collection"></param>
+        /// <param name="addCollection"></param>
         public static void AddRange<TInput>(this Stack<TInput> collection, IEnumerable<TInput> addCollection)
         {
             if (collection == null || addCollection == null)
@@ -147,36 +148,42 @@ namespace Tup.Utilities
         #region Dictionary GetValue
 
         /// <summary>
-        /// GetValue From Dictionary
+        ///     GetValue From Dictionary
         /// </summary>
+        /// <param name="obj"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static string GetValue<TValue>(this IDictionary<string, TValue> obj, string key)
+        public static string GetStringValue<TValue>(this IDictionary<string, TValue> obj, string key)
         {
-            return GetValue<TValue>(obj, key, string.Empty);
+            return GetStringValue(obj, key, string.Empty);
         }
 
         /// <summary>
-        /// GetValue From Dictionary
+        ///     GetValue From Dictionary
         /// </summary>
+        /// <param name="obj"></param>
         /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public static string GetValue<TValue>(this IDictionary<string, TValue> obj,
-                                                string key,
-                                                string defaultValue)
+        public static string GetStringValue<TValue>(this IDictionary<string, TValue> obj,
+                                                    string key,
+                                                    string defaultValue)
         {
-            return GetValue<TValue, string>(obj, key, defaultValue, tObj => tObj.ToString());
+            return GetObjectValue(obj, key, defaultValue, tObj => tObj.ToString());
         }
 
         /// <summary>
-        /// GetValue From Dictionary
+        ///     GetValue From Dictionary
         /// </summary>
+        /// <param name="obj"></param>
         /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="parseAction"></param>
         /// <returns></returns>
-        public static TResult GetValue<TValue, TResult>(this IDictionary<string, TValue> obj,
-                                                string key,
-                                                TResult defaultValue,
-                                                Func<TValue, TResult> parseAction)
+        public static TResult GetObjectValue<TValue, TResult>(this IDictionary<string, TValue> obj,
+                                                              string key,
+                                                              TResult defaultValue,
+                                                              Func<TValue, TResult> parseAction)
         {
             if (obj == null)
                 return defaultValue;
@@ -184,40 +191,43 @@ namespace Tup.Utilities
             ThrowHelper.ThrowIfNull("key", key);
             ThrowHelper.ThrowIfNull(parseAction, "parseAction");
 
-            TValue tObj = default(TValue);
-            if (obj.TryGetValue(key, out tObj) && tObj != null)
+            var tObj = default(TValue);
+            if (obj.TryGetValue(key, out tObj))
             {
                 if (tObj is TResult)
-                    return (TResult)((object)tObj);
-                else
-                    return parseAction(tObj);
+                    return (TResult)(object)tObj;
+
+                return parseAction(tObj);
             }
 
             return defaultValue;
         }
 
         /// <summary>
-        /// GetValue From Dictionary
+        ///     GetValue From Dictionary
         /// </summary>
+        /// <param name="obj"></param>
         /// <param name="key"></param>
         /// <returns></returns>
         public static TValue GetValue<TKey, TValue>(this IDictionary<TKey, TValue> obj, TKey key)
         {
-            return GetValue<TKey, TValue>(obj, key, default(TValue));
+            return GetValue(obj, key, default(TValue));
         }
 
         /// <summary>
-        /// GetValue From Dictionary
+        ///     GetValue From Dictionary
         /// </summary>
+        /// <param name="obj"></param>
         /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
         /// <returns></returns>
         public static TValue GetValue<TKey, TValue>(this IDictionary<TKey, TValue> obj,
-                                                          TKey key, TValue defaultValue)
+                                                    TKey key, TValue defaultValue)
         {
             if (obj == null)
                 return defaultValue;
 
-            TValue tObj = default(TValue);
+            var tObj = default(TValue);
             if (obj.TryGetValue(key, out tObj))
                 return tObj;
 

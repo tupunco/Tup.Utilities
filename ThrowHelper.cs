@@ -4,15 +4,15 @@ using System.Linq;
 namespace Tup.Utilities
 {
     /// <summary>
-    /// Helper methods to make it easier to throw exceptions.
+    ///     Helper methods to make it easier to throw exceptions.
     /// </summary>
     /// <remarks>
-    /// 原始代码FROM:   MoreLINQ - Extensions to LINQ to Objects
+    ///     原始代码FROM:   MoreLINQ - Extensions to LINQ to Objects
     /// </remarks>
     internal static class ThrowHelper
     {
         /// <summary>
-        /// 对象 null   判断
+        ///     对象 null   判断
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="argument"></param>
@@ -24,7 +24,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// 对象 null   判断
+        ///     对象 null   判断
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="argument"></param>
@@ -36,9 +36,8 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// 字符串对象 null,empty   判断
+        ///     字符串对象 null,empty   判断
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="argument"></param>
         /// <param name="name"></param>
         public static void ThrowIfNull(string argument, string name)
@@ -48,9 +47,8 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// 逻辑对象 false   判断
+        ///     逻辑对象 false   判断
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="argument"></param>
         /// <param name="name"></param>
         public static void ThrowIfFalse(bool argument, string name)
@@ -60,9 +58,19 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// 时间对象 MinValue  判断
+        ///     逻辑对象 true  判断
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="argument"></param>
+        /// <param name="name"></param>
+        public static void ThrowIfTrue(bool argument, string name)
+        {
+            if (argument)
+                throw new ArgumentNullException(name);
+        }
+
+        /// <summary>
+        ///     时间对象 MinValue  判断
+        /// </summary>
         /// <param name="argument"></param>
         /// <param name="name"></param>
         public static void ThrowIfNull(DateTime argument, string name)
@@ -72,7 +80,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// 小于0   判断
+        ///     小于0   判断
         /// </summary>
         /// <param name="argument"></param>
         /// <param name="name"></param>
@@ -83,7 +91,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// 小于等于0   判断
+        ///     小于等于0   判断
         /// </summary>
         /// <param name="argument"></param>
         /// <param name="name"></param>
@@ -94,7 +102,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// 小于等于0   判断
+        ///     小于等于0   判断
         /// </summary>
         /// <param name="argument"></param>
         /// <param name="name"></param>
@@ -105,7 +113,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// 超界    判断
+        ///     超界    判断
         /// </summary>
         /// <param name="argument"></param>
         /// <param name="lowerBound">下界(不包含)</param>
@@ -118,7 +126,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// 超界    判断
+        ///     超界    判断
         /// </summary>
         /// <param name="argument"></param>
         /// <param name="boundArray">需要匹配的枚举</param>
@@ -126,11 +134,12 @@ namespace Tup.Utilities
         public static void ThrowIfOutOfRange(int argument, int[] boundArray, string name)
         {
             if (!boundArray.Any(x => x == argument))
-                throw new ArgumentOutOfRangeException(name, string.Format("[{0}]", string.Join("],[", Array.ConvertAll(boundArray, x => x.ToString()))));
+                throw new ArgumentOutOfRangeException(name,
+                    string.Format("[{0}]", string.Join("],[", Array.ConvertAll(boundArray, x => x.ToString()))));
         }
 
         /// <summary>
-        /// 超界    判断
+        ///     超界    判断
         /// </summary>
         /// <param name="argument"></param>
         /// <param name="boundArray">需要匹配的枚举</param>

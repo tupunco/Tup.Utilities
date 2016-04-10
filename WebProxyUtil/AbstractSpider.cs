@@ -1,28 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Tup.Utilities.WebProxyUtil
 {
     /// <summary>
-    /// 下载器抽象类
+    ///     下载器抽象类
     /// </summary>
     public abstract class AbstractSpider
     {
+        private List<ProxyIPNode> _ResultArticleList;
+
         /// <summary>
-        /// 抓取开始页码
+        ///     抓取开始页码
         /// </summary>
         public int BeginPageNumber { set; get; }
 
         /// <summary>
-        /// 抓取结束页码
+        ///     抓取结束页码
         /// </summary>
         public int EndPageNumber { set; get; }
 
         /// <summary>
-        /// URL 地址索引
+        ///     URL 地址索引
         /// </summary>
         public int UrlFormatIndex { get; set; }
+
+        /// <summary>
+        ///     结果数据
+        /// </summary>
+        public List<ProxyIPNode> ResultArticleList
+        {
+            get
+            {
+                if (_ResultArticleList == null)
+                {
+                    _ResultArticleList = new List<ProxyIPNode>();
+                    Process();
+                }
+                return _ResultArticleList;
+            }
+            protected set { _ResultArticleList = value; }
+        }
+
+        /// <summary>
+        ///     当前操作站点
+        /// </summary>
+        public SiteEntity Site { get; protected set; }
+
+        /// <summary>
+        ///     休眠秒数 默认 0.1
+        /// </summary>
+        protected double SleepTime { get; set; } = 0.1;
 
         public virtual void WriteToTxt(string fileName)
         {
@@ -34,29 +64,32 @@ namespace Tup.Utilities.WebProxyUtil
                 ////XmlSerializeHelper.SerializeToXml<List<ProxyIPNode>>("ProxyIPConfig.o.xml", oList);
 
                 File.WriteAllLines(fileName,
-                                    ResultArticleList.ConvertAll<string>(x => string.Format(@"""{0}"",""{1}""", x.IP, x.Port)).ToArray());
+                    ResultArticleList.ConvertAll(x => string.Format(@"""{0}"",""{1}""", x.IP, x.Port)).ToArray());
             }
         }
 
         /// <summary>
-        /// 输出日志
+        ///     输出日志
         /// </summary>
         /// <param name="msg"></param>
-        public void WL(string msg) { Console.WriteLine(msg); }
+        public void WL(string msg)
+        {
+            Console.WriteLine(msg);
+        }
 
         /// <summary>
-        /// 处理
+        ///     处理
         /// </summary>
         protected abstract void Process();
 
         /// <summary>
-        /// 分析
+        ///     分析
         /// </summary>
         /// <param name="html"></param>
         protected abstract void HtmlAnalyse(string html);
 
         /// <summary>
-        /// 下载
+        ///     下载
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -72,7 +105,7 @@ namespace Tup.Utilities.WebProxyUtil
         }
 
         /// <summary>
-        /// Try to string Trim
+        ///     Try to string Trim
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
@@ -83,78 +116,37 @@ namespace Tup.Utilities.WebProxyUtil
 
             return str.Trim();
         }
-
-        private List<ProxyIPNode> _ResultArticleList;
-
-        /// <summary>
-        /// 结果数据
-        /// </summary>
-        public List<ProxyIPNode> ResultArticleList
-        {
-            get
-            {
-                if (_ResultArticleList == null)
-                {
-                    _ResultArticleList = new List<ProxyIPNode>();
-                    Process();
-                }
-                return _ResultArticleList;
-            }
-            protected set
-            {
-                _ResultArticleList = value;
-            }
-        }
-
-        /// <summary>
-        /// 当前操作站点
-        /// </summary>
-        public SiteEntity Site { get; protected set; }
-
-        private double _sleepTime = 0.1;
-
-        /// <summary>
-        /// 休眠秒数 默认 0.1
-        /// </summary>
-        protected double SleepTime
-        {
-            get { return _sleepTime; }
-            set { _sleepTime = value; }
-        }
     }
 
     /// <summary>
-    /// 操作站点
+    ///     操作站点
     /// </summary>
     public class SiteEntity
     {
+        private Encoding _PageEncoding;
+
         /// <summary>
-        /// 站点URL
+        ///     站点URL
         /// </summary>
         public string Url { get; set; }
 
         /// <summary>
-        /// 站点名
+        ///     站点名
         /// </summary>
         public string Name { set; get; }
 
-        private System.Text.Encoding _PageEncoding;
-
         /// <summary>
-        /// 站点页面编码
+        ///     站点页面编码
         /// </summary>
-        public System.Text.Encoding PageEncoding
+        public Encoding PageEncoding
         {
             get
             {
                 if (_PageEncoding == null)
-                    _PageEncoding = System.Text.Encoding.Default;
+                    _PageEncoding = Encoding.Default;
                 return _PageEncoding;
             }
-            set
-            {
-                _PageEncoding = value;
-            }
+            set { _PageEncoding = value; }
         }
     }
 }

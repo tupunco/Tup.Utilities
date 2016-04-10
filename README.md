@@ -1,7 +1,7 @@
 ﻿一组 C# 工具助手类(C # tools a set of helper classes)
 ===============
 
-目前包括助手类(Currently includes): 
+目前包括助手类(Currently includes):
 ---------------------------------
 
 * RequestHelper: [HttpRequest](http://msdn.microsoft.com/en-us/library/system.net.httpwebrequest\(v=vs.80\).aspx)助手(HttpWebRequest helper)
@@ -10,7 +10,14 @@
 * StringHelper 字符串操作工具类
 * CollectionHelper 集合处理 工具类
 * ThrowHelper 异常处理 工具类
+* ProcessHelper 进程处理 工具类
 * ConcurrentConsumerQueue/ConcurrentConsumerBufferQueue 并行多生产者单消费者队列
+* Wcf/WcfServiceProxyFactory
+* Wcf/WcfServiceHost
+* Wcf/GlobalExceptionHandler
+* Msmq/MsmqUtils
+* Msmq/MsmqBindUtils
+* Msmq/MsmqServiceProxyFactory
 
 * XmlSerializeHelper: .NET 序列化反序列化助手(.NET XML Serialization Deserialization helper);
 * LogHelper: [Log4Net](http://logging.apache.org/log4net/index.html) 日志助手(Log4Net log helper)
@@ -18,7 +25,6 @@
 
 	- 自动下载代理 IP
 	- 代理 IP 健康检查
-
 
 其他(Other):
 -----------
@@ -30,4 +36,3 @@
 TUPUNCO
 <tupunco@163.com>
 <http://weibo.com/tupunco>
-

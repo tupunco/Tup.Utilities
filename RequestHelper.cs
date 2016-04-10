@@ -9,15 +9,15 @@ using System.Web;
 namespace Tup.Utilities
 {
     /// <summary>
-    /// HttpRequest 助手
+    ///     HttpRequest 助手
     /// </summary>
     /// <remarks>
-    /// POST 功能没有详细测试
+    ///     POST 功能没有详细测试
     /// </remarks>
     public static class RequestHelper
     {
         /// <summary>
-        /// GET 方式下载指定 URL 的 HTML 内容
+        ///     GET 方式下载指定 URL 的 HTML 内容
         /// </summary>
         /// <param name="url">待下载 URL</param>
         /// <returns>下载得到的 HTML, 如果下载失败返回 NULL</returns>
@@ -28,7 +28,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// POST 方式下载指定 URL 的 HTML 内容
+        ///     POST 方式下载指定 URL 的 HTML 内容
         /// </summary>
         /// <param name="url">待下载 URL</param>
         /// <param name="isPost">是否 POST 方式下载页面</param>
@@ -41,7 +41,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// GET 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面和页面编码
+        ///     GET 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面和页面编码
         /// </summary>
         /// <param name="url">待下载 URL</param>
         /// <param name="headerReferer">待下载页面的引用页</param>
@@ -54,7 +54,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// POST 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面
+        ///     POST 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面
         /// </summary>
         /// <param name="url">待下载 URL</param>
         /// <param name="headerReferer">待下载页面的引用页</param>
@@ -62,13 +62,14 @@ namespace Tup.Utilities
         /// <param name="postData">POST 方式下载页面的参数</param>
         /// <returns>下载得到的 HTML, 如果下载失败返回 NULL</returns>
         /// <exception cref="ArgumentNullException">url is null</exception>
-        public static string DownLoadHtml(string url, string headerReferer, bool isPost, IEnumerable<KeyValuePair<string, string>> postData)
+        public static string DownLoadHtml(string url, string headerReferer, bool isPost,
+                                          IEnumerable<KeyValuePair<string, string>> postData)
         {
             return DownLoadHtml(url, headerReferer, isPost, postData, null, -1, null);
         }
 
         /// <summary>
-        /// POST 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面和页面编码
+        ///     POST 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面和页面编码
         /// </summary>
         /// <param name="url">待下载 URL</param>
         /// <param name="headerReferer">待下载页面的引用页</param>
@@ -77,13 +78,14 @@ namespace Tup.Utilities
         /// <param name="pageEncoding">待下载页面的页面编码</param>
         /// <returns>下载得到的 HTML, 如果下载失败返回 NULL</returns>
         /// <exception cref="ArgumentNullException">url is null</exception>
-        public static string DownLoadHtml(string url, string headerReferer, bool isPost, IEnumerable<KeyValuePair<string, string>> postData, Encoding pageEncoding)
+        public static string DownLoadHtml(string url, string headerReferer, bool isPost,
+                                          IEnumerable<KeyValuePair<string, string>> postData, Encoding pageEncoding)
         {
             return DownLoadHtml(url, headerReferer, isPost, postData, pageEncoding, -1, null);
         }
 
         /// <summary>
-        /// GET 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面/页面编码/HTTP 代理
+        ///     GET 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面/页面编码/HTTP 代理
         /// </summary>
         /// <param name="url">待下载 URL</param>
         /// <param name="headerReferer">待下载页面的引用页</param>
@@ -97,7 +99,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// GET 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面/页面编码/下载超时时间/HTTP 代理
+        ///     GET 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面/页面编码/下载超时时间/HTTP 代理
         /// </summary>
         /// <param name="url">待下载 URL</param>
         /// <param name="headerReferer">待下载页面的引用页</param>
@@ -106,13 +108,14 @@ namespace Tup.Utilities
         /// <param name="webProxy">当前下载操作使用的 HTTP 代理</param>
         /// <returns>下载得到的 HTML, 如果下载失败返回 NULL</returns>
         /// <exception cref="ArgumentNullException">url is null</exception>
-        public static string DownLoadHtml(string url, string headerReferer, Encoding pageEncoding, int timeout, IWebProxy webProxy)
+        public static string DownLoadHtml(string url, string headerReferer, Encoding pageEncoding, int timeout,
+                                          IWebProxy webProxy)
         {
             return DownLoadHtml(url, headerReferer, false, null, pageEncoding, timeout, webProxy);
         }
 
         /// <summary>
-        /// POST 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面/页面编码/下载超时时间/HTTP 代理
+        ///     POST 方式下载指定 URL 的 HTML 内容, 本方法可指定待下载页面的引用页面/页面编码/下载超时时间/HTTP 代理
         /// </summary>
         /// <param name="url">待下载 URL</param>
         /// <param name="headerReferer">待下载页面的引用页</param>
@@ -123,7 +126,9 @@ namespace Tup.Utilities
         /// <param name="webProxy">当前下载操作使用的 HTTP 代理</param>
         /// <returns>下载得到的 HTML, 如果下载失败返回 NULL</returns>
         /// <exception cref="ArgumentNullException">url is null</exception>
-        public static string DownLoadHtml(string url, string headerReferer, bool isPost, IEnumerable<KeyValuePair<string, string>> postData, Encoding pageEncoding, int timeout, IWebProxy webProxy)
+        public static string DownLoadHtml(string url, string headerReferer, bool isPost,
+                                          IEnumerable<KeyValuePair<string, string>> postData, Encoding pageEncoding,
+                                          int timeout, IWebProxy webProxy)
         {
             if (pageEncoding == null)
                 pageEncoding = Encoding.Default;
@@ -133,7 +138,7 @@ namespace Tup.Utilities
             byte[] tPostData = null;
             if (isPost && postData != null)
             {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 foreach (var item in postData)
                 {
                     if (!string.IsNullOrEmpty(item.Key)
@@ -143,7 +148,8 @@ namespace Tup.Utilities
                             sb.Append("&");
 
                         sb.AppendFormat("{0}={1}", item.Key,
-                                HttpUtility.UrlEncode(item.Value, pageEncoding));//INFO UrlEncode, 字节使用 PageEncoding.GetBytes()得到
+                            HttpUtility.UrlEncode(item.Value, pageEncoding));
+                        //INFO UrlEncode, 字节使用 PageEncoding.GetBytes()得到
                     }
                 }
                 if (sb.Length != 0)
@@ -156,17 +162,16 @@ namespace Tup.Utilities
 
             if (stream != null)
             {
-                using (System.IO.StreamReader sr = new StreamReader(stream, pageEncoding))
+                using (var sr = new StreamReader(stream, pageEncoding))
                 {
                     return sr.ReadToEnd();
                 }
             }
-            else
-                return null;
+            return null;
         }
 
         /// <summary>
-        /// GET 方式下载指定 URL 的流数据内容, 本方法可指定待下载页面的引用页面/下载超时时间/HTTP 代理
+        ///     GET 方式下载指定 URL 的流数据内容, 本方法可指定待下载页面的引用页面/下载超时时间/HTTP 代理
         /// </summary>
         /// <param name="url">待下载 URL</param>
         /// <param name="headerReferer">待下载页面的引用页</param>
@@ -180,7 +185,7 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// PSOT 方式下载指定 URL 的流数据内容, 本方法可指定待下载页面的引用页面/页面编码/下载超时时间/HTTP 代理
+        ///     PSOT 方式下载指定 URL 的流数据内容, 本方法可指定待下载页面的引用页面/页面编码/下载超时时间/HTTP 代理
         /// </summary>
         /// <param name="url">待下载 URL</param>
         /// <param name="headerReferer">待下载页面的引用页</param>
@@ -191,14 +196,15 @@ namespace Tup.Utilities
         /// <param name="webProxy">当前下载操作使用的 HTTP 代理</param>
         /// <returns>下载得到的页面流数据, 如果下载失败返回 NULL</returns>
         /// <exception cref="ArgumentNullException">url is null</exception>
-        public static Stream DownLoadStream(string url, string headerReferer, bool isPost, byte[] postData, int timeout, IWebProxy webProxy)
+        public static Stream DownLoadStream(string url, string headerReferer, bool isPost, byte[] postData, int timeout,
+                                            IWebProxy webProxy)
         {
             if (string.IsNullOrEmpty(url))
                 throw new ArgumentNullException("url", "[url] null...");
 
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                var request = (HttpWebRequest)WebRequest.Create(url);
                 {
                     request.Accept = "*/*";
 
@@ -224,7 +230,7 @@ namespace Tup.Utilities
                         {
                             request.ContentLength = postData.Length;
 
-                            using (Stream requestStream = request.GetRequestStream())
+                            using (var requestStream = request.GetRequestStream())
                             {
                                 requestStream.Write(postData, 0, postData.Length);
                             }
@@ -236,17 +242,18 @@ namespace Tup.Utilities
                     #endregion 拼接 POST 数据
 
                     request.Headers["Accept-Language"] = "zh-cn";
-                    request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; InfoPath.2; .NET CLR 2.0.50727; CIBA; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; .NET4.0E)";
+                    request.UserAgent =
+                        "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; InfoPath.2; .NET CLR 2.0.50727; CIBA; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET4.0C; .NET4.0E)";
 
-                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                    using (var response = (HttpWebResponse)request.GetResponse())
                     {
-                        MemoryStream stream = new MemoryStream();
-                        var resStream = response.ContentEncoding != "gzip"  //解压某些WEB服务器强行响应 GZIP 数据
-                                            ? response.GetResponseStream()
-                                            : new GZipStream(response.GetResponseStream(), CompressionMode.Decompress);
+                        var stream = new MemoryStream();
+                        var resStream = response.ContentEncoding != "gzip" //解压某些WEB服务器强行响应 GZIP 数据
+                            ? response.GetResponseStream()
+                            : new GZipStream(response.GetResponseStream(), CompressionMode.Decompress);
 
-                        byte[] buffer = new byte[1024];
-                        int len = 0;
+                        var buffer = new byte[1024];
+                        var len = 0;
                         while ((len = resStream.Read(buffer, 0, 1024)) > 0)
                         {
                             stream.Write(buffer, 0, len);

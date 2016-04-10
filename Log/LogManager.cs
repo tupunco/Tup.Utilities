@@ -3,25 +3,25 @@
 namespace Tup.Utilities
 {
     /// <summary>
-    /// 日志类
+    ///     日志类
     /// </summary>
     /// <remarks>
-    /// 调用 Log4Net 日志模块
+    ///     调用 Log4Net 日志模块
     /// </remarks>
     public class LogManager
     {
+        public static LogManager Instance = new LogManager();
+
         static LogManager()
         {
             //初始化 Log4Net
             LogHelper.Init();
         }
 
-        public static LogManager Instance = new LogManager();
-
         #region Debug Log(调试模式有效)
 
         /// <summary>
-        /// Debug Log(调试模式有效)
+        ///     Debug Log(调试模式有效)
         /// </summary>
         /// <param name="msg"></param>
         [Conditional("DEBUG")]
@@ -31,9 +31,10 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// Debug Log(调试模式有效)
+        ///     Debug Log(调试模式有效)
         /// </summary>
-        /// <param name="msg"></param>
+        /// <param name="format"></param>
+        /// <param name="msgs"></param>
         [Conditional("DEBUG")]
         public void Debug(string format, params object[] msgs)
         {
@@ -45,7 +46,7 @@ namespace Tup.Utilities
         #region Error Log
 
         /// <summary>
-        /// Error Log
+        ///     Error Log
         /// </summary>
         /// <param name="msg"></param>
         public void Error(string msg)
@@ -54,9 +55,10 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// Error Log
+        ///     Error Log
         /// </summary>
-        /// <param name="msg"></param>
+        /// <param name="format"></param>
+        /// <param name="msgs"></param>
         public void Error(string format, params object[] msgs)
         {
             Error(string.Format(format, msgs));
@@ -67,7 +69,7 @@ namespace Tup.Utilities
         #region Info Log
 
         /// <summary>
-        /// Info Log
+        ///     Info Log
         /// </summary>
         /// <param name="msg"></param>
         public void Info(string msg)
@@ -76,9 +78,10 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// Info Log
+        ///     Info Log
         /// </summary>
-        /// <param name="msg"></param>
+        /// <param name="format"></param>
+        /// <param name="msgs"></param>
         public void Info(string format, params object[] msgs)
         {
             Info(string.Format(format, msgs));
@@ -89,7 +92,7 @@ namespace Tup.Utilities
         #region Fatal Log
 
         /// <summary>
-        /// Fatal Log
+        ///     Fatal Log
         /// </summary>
         /// <param name="msg"></param>
         public void Fatal(string msg)
@@ -98,9 +101,10 @@ namespace Tup.Utilities
         }
 
         /// <summary>
-        /// Fatal Log
+        ///     Fatal Log
         /// </summary>
-        /// <param name="msg"></param>
+        /// <param name="format"></param>
+        /// <param name="msgs"></param>
         public void Fatal(string format, params object[] msgs)
         {
             Fatal(string.Format(format, msgs));
