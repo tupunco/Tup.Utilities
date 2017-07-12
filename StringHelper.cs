@@ -128,6 +128,26 @@ namespace Tup.Utilities
         #endregion ToArrayEx
 
         #region ParseTo
+        /// <summary>
+        ///     解析当前字符串到 Boolean 值
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="defaultVal"></param>
+        /// <returns></returns>
+        public static bool ParseToBoolean(this string str, bool defaultVal)
+        {
+            if (str.IsEmpty())
+                return defaultVal;
+
+            return ParseTo(str, cs =>
+            {
+                var rel = false;
+                if (!bool.TryParse(cs, out rel))
+                    rel = defaultVal;
+
+                return rel;
+            });
+        }
 
         /// <summary>
         ///     解析当前字符串到 Int32 值
