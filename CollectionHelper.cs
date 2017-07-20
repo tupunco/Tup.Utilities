@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Tup.Utilities
 {
@@ -39,9 +40,15 @@ namespace Tup.Utilities
         /// </summary>
         /// <param name="input">array to check</param>
         /// <returns>bool</returns>
-        public static bool IsEmpty<T>(this ICollection<T> input)
+        public static bool IsEmpty<T>(this IEnumerable<T> input)
         {
-            return input == null || input.Count <= 0;
+            if (input == null)
+                return true;
+
+            if (input is ICollection<T>)
+                return (input as ICollection<T>).Count <= 0;
+
+            return !input.Any();
         }
 
         #endregion IsEmpty
