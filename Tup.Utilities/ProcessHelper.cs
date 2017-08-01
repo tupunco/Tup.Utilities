@@ -9,6 +9,11 @@ namespace Tup.Utilities
     /// </summary>
     public static class ProcessHelper
     {
+        /// <summary>
+        /// Logger
+        /// </summary>
+        private readonly static Logging.ILogger Log = Logging.LogManager.GetLogger(typeof(ProcessHelper));
+
         #region 模拟控制台信号需要使用的api
         [DllImport("kernel32.dll")]
         public static extern bool GenerateConsoleCtrlEvent(int dwCtrlEvent, int dwProcessGroupId);
@@ -45,8 +50,8 @@ namespace Tup.Utilities
             }
             catch (Exception ex)
             {
-                LogHelper.Write("ProcessStart-startFileName:{0}-startFileArg:{1}-ex:{2}"
-                                    .Fmt(startFileName, startFileArg, ex), LogHelper.LogMessageType.Error);
+                Log.Error("ProcessStart-startFileName:{0}-startFileArg:{1}-ex:{2}"
+                                    .Fmt(startFileName, startFileArg, ex));
 
                 //Console.WriteLine("ProcessHelper-file:{0}-arg:{1}-ex:{2}",
                 //                    startFileName, startFileArg, ex);
@@ -83,7 +88,7 @@ namespace Tup.Utilities
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Write("ProcessStart-StopProcess:{0}".Fmt(ex), LogHelper.LogMessageType.Error);
+                    Log.Error("ProcessStart-StopProcess:{0}".Fmt(ex));
                     ex = null;
                     //Console.WriteLine(ex);
                 }

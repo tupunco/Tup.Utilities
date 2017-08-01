@@ -78,8 +78,6 @@
     <Compile Include="Logging\LogManager.cs" />
     <Compile Include="Logging\Null\NullLogFactory.cs" />
     <Compile Include="Logging\Null\NullLogger.cs" />
-    <Compile Include="Log\LogHelper.cs" />
-    <Compile Include="Log\LogManager.cs" />
     <Compile Include="ProcessHelper.cs" />
     <Compile Include="ThreadHelper.cs" />
     <Compile Include="Wcf\MessageBase.cs" />

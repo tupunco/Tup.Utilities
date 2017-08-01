@@ -15,6 +15,11 @@ namespace Tup.Utilities
     public abstract class ConcurrentConsumerQueue<TData> : IDisposable
         where TData : class
     {
+        /// <summary>
+        /// Logger
+        /// </summary>
+        private readonly static Logging.ILogger Log = Logging.LogManager.GetLogger<ConcurrentConsumerQueue<TData>>();
+
         private readonly BlockingCollection<TData> _itemQueue = new BlockingCollection<TData>();
 
         /// <summary>
@@ -48,7 +53,7 @@ namespace Tup.Utilities
             }
             catch (Exception ex)
             {
-                LogManager.Instance.Error("{0}-Enqueue(itemQueue.Add)-ex:{1}", GetType(), ex);
+                Log.Error("Enqueue(itemQueue.Add)",  ex);
             }
         }
 
@@ -66,8 +71,8 @@ namespace Tup.Utilities
                 }
                 catch (Exception ex)
                 {
-                    LogManager.Instance.Error("{0}-ConcurrentConsumerQueue-DataItem:{1}-ex:{2}",
-                        GetType(), dataItem, ex);
+                    Log.ErrorFormat("ConcurrentConsumerQueue-DataItem:{0}-ex:{1}",
+                         dataItem, ex);
                     ex = null;
 
                     Thread.Sleep(5);
@@ -99,7 +104,7 @@ namespace Tup.Utilities
             }
             catch (Exception ex)
             {
-                LogManager.Instance.Error("{0}-Dispose(CompleteAdding)-ex:{1}", GetType(), ex);
+                Log.Error("Dispose(CompleteAdding)", ex);
             }
             GC.SuppressFinalize(this);
         }

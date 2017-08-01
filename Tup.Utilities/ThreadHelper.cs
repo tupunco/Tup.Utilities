@@ -10,6 +10,11 @@ namespace Tup.Utilities
     /// </summary>
     public static class ThreadHelper
     {
+        /// <summary>
+        /// Logger
+        /// </summary>
+        private readonly static Logging.ILogger Log = Logging.LogManager.GetLogger(typeof(ThreadHelper));
+
         ///// <summary>
         ///// 延迟 Action
         ///// </summary>
@@ -89,7 +94,7 @@ namespace Tup.Utilities
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Write("ThreadPool_QueueUserWorkItem-EX:{0}".Fmt(ex), LogHelper.LogMessageType.Error);
+                    Log.Error("ThreadPool_QueueUserWorkItem-EX:{0}".Fmt(ex));
 
                     if (failedAction != null)
                         failedAction(ex);

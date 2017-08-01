@@ -12,6 +12,11 @@ namespace Tup.Utilities.WebProxyUtil
     public static class WebProxyHelper
     {
         /// <summary>
+        /// Logger
+        /// </summary>
+        private readonly static Logging.ILogger Log = Logging.LogManager.GetLogger(typeof(WebProxyHelper));
+
+        /// <summary>
         ///     代理配置文件保存文件
         /// </summary>
         private static readonly string s_Config_ProxyIPConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
@@ -64,7 +69,7 @@ namespace Tup.Utilities.WebProxyUtil
             L1:
             if (_webProxyIPList == null || _webProxyIPList.Count == 0)
             {
-                LogManager.Instance.Info("代理列表为空,无法使用代理.");
+                Log.Info("代理列表为空,无法使用代理.");
                 return null;
             }
 
@@ -119,12 +124,12 @@ namespace Tup.Utilities.WebProxyUtil
                 }
                 catch (Exception ex)
                 {
-                    LogManager.Instance.Error("CheckWebProxy-ProxyIPNode:{0}-ex:{1}", cProxyNode, ex);
+                    Log.ErrorFormat("CheckWebProxy-ProxyIPNode:{0}-ex:{1}", cProxyNode, ex);
                     ex = null;
                     return false;
                 }
             }
-            return cProxyNode.CanUse;
+            //return cProxyNode.CanUse;
         }
 
         /// <summary>
@@ -175,7 +180,7 @@ namespace Tup.Utilities.WebProxyUtil
 
             if (nList == null || nList.Count == 0)
             {
-                LogManager.Instance.Info("ReDownLoadWebProxyList-NULL");
+                Log.Info("ReDownLoadWebProxyList-NULL");
                 return;
             }
             var cList = CheckAllWebProxy(nList);
@@ -183,10 +188,10 @@ namespace Tup.Utilities.WebProxyUtil
             {
                 XmlSerializeHelper.SerializeToXml(s_Config_ProxyIPConfigPath, cList);
                 _webProxyIPList = cList;
-                LogManager.Instance.Info("ReDownLoadWebProxyList-Checked-UPDATE-Num:{0}", cList.Count);
+                Log.InfoFormat("ReDownLoadWebProxyList-Checked-UPDATE-Num:{0}", cList.Count);
             }
             else
-                LogManager.Instance.Info("ReDownLoadWebProxyList-Checked-NULL");
+                Log.Info("ReDownLoadWebProxyList-Checked-NULL");
         }
     }
 }

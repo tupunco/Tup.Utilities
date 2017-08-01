@@ -47,6 +47,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Log4Net.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tup.Utilities\Tup.Utilities.csproj">
+      <Project>{d06f9743-8dec-4691-8b7c-bdd3337900a9}</Project>
+      <Name>Tup.Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

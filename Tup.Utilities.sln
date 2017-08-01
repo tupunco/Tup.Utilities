@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{94C8F285-73BF-49CE-98DB-4156D7BFDEFB}"
 	ProjectSection(SolutionItems) = preProject
@@ -9,7 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Com\log4net.xml = Com\log4net.xml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tup.Utilities", "Tup.Utilities/Tup.Utilities.csproj", "{D06F9743-8DEC-4691-8B7C-BDD3337900A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tup.Utilities", "Tup.Utilities\Tup.Utilities.csproj", "{D06F9743-8DEC-4691-8B7C-BDD3337900A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tup.Utilities.Demo", "Tup.Utilities.Demo\Tup.Utilities.Demo.csproj", "{D807A3B4-3A26-4E55-B149-FCFC9AD6FE45}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{D06F9743-8DEC-4691-8B7C-BDD3337900A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D06F9743-8DEC-4691-8B7C-BDD3337900A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D06F9743-8DEC-4691-8B7C-BDD3337900A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D807A3B4-3A26-4E55-B149-FCFC9AD6FE45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D807A3B4-3A26-4E55-B149-FCFC9AD6FE45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D807A3B4-3A26-4E55-B149-FCFC9AD6FE45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D807A3B4-3A26-4E55-B149-FCFC9AD6FE45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

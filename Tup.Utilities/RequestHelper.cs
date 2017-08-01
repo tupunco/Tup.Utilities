@@ -17,6 +17,11 @@ namespace Tup.Utilities
     public static class RequestHelper
     {
         /// <summary>
+        /// Logger
+        /// </summary>
+        private readonly static Logging.ILogger Log = Logging.LogManager.GetLogger(typeof(RequestHelper));
+
+        /// <summary>
         ///     GET 方式下载指定 URL 的 HTML 内容
         /// </summary>
         /// <param name="url">待下载 URL</param>
@@ -266,7 +271,7 @@ namespace Tup.Utilities
             }
             catch (Exception ex)
             {
-                LogManager.Instance.Error(null, url, headerReferer, ex);
+                Log.Error("url:{0}, headerReferer:{1}".Fmt(url, headerReferer), ex);
                 ex = null;
             }
             return null;
