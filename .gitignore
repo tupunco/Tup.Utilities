@@ -2,8 +2,8 @@
 *.vssscc
 *.scc
 *.user
-Bin/*
-obj/*
+*/Bin/*
+*/obj/*
 /*.suo
 /*.vssscc
 /*.scc
@@ -11,4 +11,4 @@ obj/*
 /Dotfuscated/*
 /PerfLogs/*
 
-/.vs/config
+/.vs/*

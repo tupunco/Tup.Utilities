@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Com\log4net.xml = Com\log4net.xml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tup.Utilities", "Tup.Utilities.csproj", "{D06F9743-8DEC-4691-8B7C-BDD3337900A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tup.Utilities", "Tup.Utilities/Tup.Utilities.csproj", "{D06F9743-8DEC-4691-8B7C-BDD3337900A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

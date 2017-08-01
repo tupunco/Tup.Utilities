@@ -71,6 +71,13 @@
     <Compile Include="ConcurrentConsumerQueue.cs" />
     <Compile Include="HashSet.cs" />
     <Compile Include="JsonHelper.cs" />
+    <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Logging\ILoggerFactory.cs" />
+    <Compile Include="Logging\Log4Net\Log4NetLogger.cs" />
+    <Compile Include="Logging\Log4Net\Log4NetLoggerFactory.cs" />
+    <Compile Include="Logging\LogManager.cs" />
+    <Compile Include="Logging\Null\NullLogFactory.cs" />
+    <Compile Include="Logging\Null\NullLogger.cs" />
     <Compile Include="Log\LogHelper.cs" />
     <Compile Include="Log\LogManager.cs" />
     <Compile Include="ProcessHelper.cs" />
@@ -95,8 +102,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="LICENSE" />
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
