@@ -53,7 +53,7 @@ namespace Tup.Utilities
             }
             catch (Exception ex)
             {
-                Log.Error("Enqueue(itemQueue.Add)",  ex);
+                Log.Error("Enqueue(itemQueue.Add)", ex);
             }
         }
 
@@ -276,4 +276,68 @@ namespace Tup.Utilities
 
         #endregion Dispose
     }
+
 }
+
+//namespace Tup.Utilities.Test
+//{
+//    public class TestClass
+//    {
+//        /// <summary>
+//        /// 发送 MSMQ
+//        /// </summary>
+//        /// <param name="tag"></param>
+//        /// <param name="msgMQ"></param>
+//        public static void SendMQ(string tag, string msgMQ)
+//        {
+//            //Single Queue
+//            s_MQSendQueue.Enqueue(new Pair<string, string>(tag, msgMQ));
+
+//            //Buffer Queue
+//            s_MQBufferSendQueue.Enqueue(new Pair<string, string>(tag, msgMQ));
+//        }
+
+//        /// <summary>
+//        /// MQ 发送队列
+//        /// </summary>
+//        private static MQConsumerQueue s_MQSendQueue = new MQConsumerQueue();
+//        /// <summary>
+//        /// MQ 发送队列
+//        /// </summary>
+//        public class MQConsumerQueue
+//            : ConcurrentConsumerQueue<Pair<string, string>>
+//        {
+//            protected override void Process(Pair<string, string> dataItem)
+//            {
+//                if (dataItem == null || dataItem.Key.IsEmpty() || dataItem.Value.IsEmpty())
+//                    return;
+
+//                //TODO SendMQ
+//                System.Console.WriteLine("MQConsumerQueue-Process:{0}", dataItem);
+//            }
+//        }
+
+//        /// <summary>
+//        /// MQ Buffer 发送队列
+//        /// </summary>
+//        private static MQBufferConsumerQueue s_MQBufferSendQueue = new MQBufferConsumerQueue();
+//        /// <summary>
+//        /// MQ Buffer 发送队列
+//        /// </summary>
+//        public class MQBufferConsumerQueue
+//            : ConcurrentConsumerBufferQueue<Pair<string, string>>
+//        {
+//            public MQBufferConsumerQueue() : base(10, 5000) { }
+
+//            protected override void FlushProcessItem(IEnumerable<Pair<string, string>> dataBufferQueue)
+//            {
+//                if (dataBufferQueue == null)
+//                    return;
+
+//                //TODO Buffer SendMQ
+//                System.Console.WriteLine("MQBufferConsumerQueue-FlushProcessItem:\r\n{0}",
+//                                                string.Join(",\r\nE", dataBufferQueue));
+//            }
+//        }
+//    }
+//}

@@ -33,6 +33,6 @@
 
 联系(Contact):
 -------------
-TUPUNCO
-<tupunco@163.com>
-<http://weibo.com/tupunco>
+- TUPUNCO
+- <tupunco@163.com>
+- <http://weibo.com/tupunco>
