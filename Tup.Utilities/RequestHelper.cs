@@ -196,7 +196,6 @@ namespace Tup.Utilities
         /// <param name="headerReferer">待下载页面的引用页</param>
         /// <param name="isPost">是否 POST 方式下载页面</param>
         /// <param name="postData">POST 方式下载页面的参数</param>
-        /// <param name="pageEncoding">待下载页面的页面编码</param>
         /// <param name="timeout">下载页面的超时时间, -1 将忽略本项, 单位:毫秒, 默认值为 100,000 毫秒</param>
         /// <param name="webProxy">当前下载操作使用的 HTTP 代理</param>
         /// <returns>下载得到的页面流数据, 如果下载失败返回 NULL</returns>
@@ -241,7 +240,7 @@ namespace Tup.Utilities
                             }
                         }
                         else
-                            request.ContentLength = 0l;
+                            request.ContentLength = 0L;
                     }
 
                     #endregion 拼接 POST 数据

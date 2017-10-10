@@ -1,6 +1,6 @@
-﻿namespace Tup.Utilities
+﻿#if NET_2
+namespace Tup.Utilities
 {
-#if NET_2
     /// <summary>
     /// A simple hashset, built on Dictionary{K, V}
     /// </summary>
@@ -101,5 +101,6 @@
             return new List<T>(_data.Keys);
         }
     }
-#endif
 }
+#endif
+

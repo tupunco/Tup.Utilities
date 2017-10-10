@@ -41,7 +41,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_4</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -49,7 +49,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NET_4</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -69,6 +69,8 @@
   <ItemGroup>
     <Compile Include="CollectionHelper.cs" />
     <Compile Include="ConcurrentConsumerQueue.cs" />
+    <Compile Include="DateTimeHelper.cs" />
+    <Compile Include="EnumHelper.cs" />
     <Compile Include="HashSet.cs" />
     <Compile Include="JsonHelper.cs" />
     <Compile Include="Logging\ILogger.cs" />
@@ -79,6 +81,8 @@
     <Compile Include="Logging\Null\NullLogFactory.cs" />
     <Compile Include="Logging\Null\NullLogger.cs" />
     <Compile Include="ProcessHelper.cs" />
+    <Compile Include="ReflectionHelper.cs" />
+    <Compile Include="StreamHelper.cs" />
     <Compile Include="ThreadHelper.cs" />
     <Compile Include="Wcf\MessageBase.cs" />
     <Compile Include="Msmq\MsmqBindUtils.cs" />

@@ -370,27 +370,27 @@ namespace Tup.Utilities
 
         #region byte-AsString
 
-        /// <summary>
-        /// Read a stream into a byte array
-        /// </summary>
-        /// <param name="input">Stream to read</param>
-        /// <returns>byte[]</returns>
-        public static byte[] ReadAsBytes(this Stream input)
-        {
-            if (input == null)
-                return null;
+        ///// <summary>
+        ///// Read a stream into a byte array
+        ///// </summary>
+        ///// <param name="input">Stream to read</param>
+        ///// <returns>byte[]</returns>
+        //public static byte[] ReadAsBytes(this Stream input)
+        //{
+        //    if (input == null)
+        //        return null;
 
-            byte[] buffer = new byte[16 * 1024];
-            using (var ms = new MemoryStream())
-            {
-                int read;
-                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    ms.Write(buffer, 0, read);
-                }
-                return ms.ToArray();
-            }
-        }
+        //    byte[] buffer = new byte[16 * 1024];
+        //    using (var ms = new MemoryStream())
+        //    {
+        //        int read;
+        //        while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+        //        {
+        //            ms.Write(buffer, 0, read);
+        //        }
+        //        return ms.ToArray();
+        //    }
+        //}
 
         /// <summary>
         /// Converts a byte array to a string, using its byte order mark to convert it to the right encoding.
