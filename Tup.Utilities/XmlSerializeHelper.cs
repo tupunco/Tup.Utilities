@@ -16,8 +16,6 @@ namespace Tup.Utilities
         /// <typeparam name="T"></typeparam>
         /// <param name="filePath"></param>
         /// <param name="obj"></param>
-        /// <exception cref="ArgumentNullException">filePath arg is null</exception>
-        /// <exception cref="ArgumentNullException">obj arg is null</exception>
         public static void SerializeToXml<T>(string filePath, T obj)
         {
             ThrowHelper.ThrowIfNull(filePath, "filePath");
@@ -35,7 +33,6 @@ namespace Tup.Utilities
         /// </summary>
         /// <param name="filePath">待反序列化的 XML 文件名称</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException">filePath arg is null</exception>
         public static T DeserializeFromXml<T>(string filePath)
         {
             ThrowHelper.ThrowIfNull(filePath, "filePath");
