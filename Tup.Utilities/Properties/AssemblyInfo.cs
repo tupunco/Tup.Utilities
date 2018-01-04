@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Tup.Utilities")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("上海盛大网络发展有限公司")]
+[assembly: AssemblyCompany("TUPUNCO")]
 [assembly: AssemblyProduct("Tup.Utilities")]
-[assembly: AssemblyCopyright("Copyright © 上海盛大网络发展有限公司 2011")]
+[assembly: AssemblyCopyright("Copyright © TUPUNCO 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

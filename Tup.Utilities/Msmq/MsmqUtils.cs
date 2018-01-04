@@ -2,7 +2,7 @@
 using System.Messaging;
 using System.Threading;
 
-using log4net;
+using Tup.Utilities.Logging;
 
 namespace Tup.Utilities.Msmq
 {
@@ -57,7 +57,7 @@ namespace Tup.Utilities.Msmq
         /// <summary>
         ///     Logger
         /// </summary>
-        private static readonly ILog Logger = log4net.LogManager.GetLogger(typeof(MsmqUtils));
+        private static readonly ILogger Logger = LogManager.GetLogger(typeof(MsmqUtils));
 
         /// <summary>
         ///     单 MQ 处理

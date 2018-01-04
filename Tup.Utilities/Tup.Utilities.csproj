@@ -70,6 +70,14 @@
     <Compile Include="CollectionHelper.cs" />
     <Compile Include="ConcurrentConsumerQueue.cs" />
     <Compile Include="DateTimeHelper.cs" />
+    <Compile Include="DbWrapper\DbCommandWrapper.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DbWrapper\DbConnectionWrapper.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DbWrapper\DbProviderFactoryWrapper.cs" />
+    <Compile Include="DbWrapper\DbTransactionWrapper.cs" />
     <Compile Include="EnumHelper.cs" />
     <Compile Include="HashSet.cs" />
     <Compile Include="JsonHelper.cs" />

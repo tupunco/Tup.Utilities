@@ -5,7 +5,7 @@ using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
 using System.ServiceModel.Dispatcher;
 
-using log4net;
+using Tup.Utilities.Logging;
 
 namespace Tup.Utilities.Wcf
 {
@@ -20,7 +20,7 @@ namespace Tup.Utilities.Wcf
         /// <summary>
         ///     测试log4net
         /// </summary>
-        private static readonly ILog log = log4net.LogManager.GetLogger(typeof(GlobalExceptionHandler));
+        private static readonly ILogger Log = LogManager.GetLogger(typeof(GlobalExceptionHandler));
 
         #region IErrorHandler Members
 
@@ -43,7 +43,7 @@ namespace Tup.Utilities.Wcf
         public void ProvideFault(Exception ex, MessageVersion version, ref Message msg)
         {
             /// 写入log4net
-            log.Error("WCF 异常", ex);
+            Log.Error("WCF 异常", ex);
 
             var newEx = new FaultException(string.Format("WCF 接口出错 {0}", ex.TargetSite.Name));
             var msgFault = newEx.CreateMessageFault();

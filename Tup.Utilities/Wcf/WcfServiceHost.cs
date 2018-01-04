@@ -4,7 +4,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Description;
 
-using log4net;
+using Tup.Utilities.Logging;
 
 namespace Tup.Utilities.Wcf
 {
@@ -16,7 +16,7 @@ namespace Tup.Utilities.Wcf
     /// </remarks>
     internal static class WcfServiceHost
     {
-        private static readonly ILog Logger = log4net.LogManager.GetLogger(typeof(WcfServiceHost));
+        private static readonly ILogger Log = LogManager.GetLogger(typeof(WcfServiceHost));
 
         /// <summary>
         ///     Service Host List
@@ -24,9 +24,9 @@ namespace Tup.Utilities.Wcf
         private static readonly List<ServiceHost> s_ServiceHostList = new List<ServiceHost>();
 
         /// <summary>
-        ///     PSIServices Namespace Prefix
+        ///     Namespace Prefix
         /// </summary>
-        private static readonly string s_PSIServices_NamespacePrefix = "Joyeon.Group.Psi2Services";
+        private static readonly string s_Services_NamespacePrefix = "Tup.XXX.Services";
 
         /// <summary>
         ///     注册并运行所有 ServiceHost
@@ -36,7 +36,7 @@ namespace Tup.Utilities.Wcf
             //1.加载本应用域中所有继承自 IPsiService 的类型
             var assemblies = AppDomain.CurrentDomain
                                       .GetAssemblies()
-                                      .Where(x => x.FullName.StartsWith(s_PSIServices_NamespacePrefix));
+                                      .Where(x => x.FullName.StartsWith(s_Services_NamespacePrefix));
 
             var modules = new List<Type>();
             foreach (var asm in assemblies)
@@ -94,9 +94,9 @@ namespace Tup.Utilities.Wcf
                                              bool isError = false)
         {
             if (isError)
-                Logger.ErrorFormat("{0}-{1}-{2}-{3}", hostDescription.Name, hostDescription.ServiceType, e, tag);
+                Log.ErrorFormat("{0}-{1}-{2}-{3}", hostDescription.Name, hostDescription.ServiceType, e, tag);
             else
-                Logger.InfoFormat("{0}-{1}-{2}-{3}", hostDescription.Name, hostDescription.ServiceType, e, tag);
+                Log.InfoFormat("{0}-{1}-{2}-{3}", hostDescription.Name, hostDescription.ServiceType, e, tag);
         }
     }
 }
