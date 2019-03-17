@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BatchHelper.cs" />
     <Compile Include="CollectionHelper.cs" />
     <Compile Include="ConcurrentConsumerQueue.cs" />
     <Compile Include="DateTimeHelper.cs" />

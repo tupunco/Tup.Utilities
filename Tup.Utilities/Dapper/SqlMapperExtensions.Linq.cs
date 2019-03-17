@@ -6,6 +6,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
+using Tup.Utilities;
+
 namespace Dapper
 {
     /// <summary>
@@ -167,12 +169,12 @@ namespace Dapper
                 }
             }
 
-            public static string GetMethodCallSqlOperator(string methodName)
+            public static string GetMethodCallSqlOperator(string methodName, bool isNotUnary = false)
             {
                 switch (methodName)
                 {
                     case "Contains":
-                        return "IN";
+                        return isNotUnary ? "NOT IN" : "IN";
 
                     case "Any":
                     case "All":
@@ -217,7 +219,12 @@ namespace Dapper
             {
                 var expr = expression as MethodCallExpression;
                 if (expr != null)
-                    return (MemberExpression)expr.Arguments[0];
+                {
+                    if (expr.Method.IsStatic)
+                        return (MemberExpression)expr.Arguments.Last();
+                    else
+                        return (MemberExpression)expr.Arguments[0];
+                }
 
                 var memberExpression = expression as MemberExpression;
                 if (memberExpression != null)
@@ -289,19 +296,88 @@ namespace Dapper
         }
 
         /// <summary>
-        ///     Class that models the data structure in coverting the expression tree into SQL and Params.
+        /// 查询表达式 类型 Enum
         /// </summary>
-        internal class QueryParameter
+        internal enum QueryExpressionType
         {
             /// <summary>
-            ///     Initializes a new instance of the <see cref="QueryParameter" /> class.
+            /// 参数
+            /// </summary>
+            Parameter = 0,
+
+            /// <summary>
+            /// 二叉
+            /// </summary>
+            Binary = 1,
+        }
+
+        /// <summary>
+        /// 查询表达式
+        /// </summary>
+        internal abstract class QueryExpression
+        {
+            /// <summary>
+            /// 节点类型
+            /// </summary>
+            public QueryExpressionType NodeType { get; set; }
+
+            /// <summary>
+            /// 操作符 OR/AND
+            /// </summary>
+            public string LinkingOperator { get; set; }
+
+            public override string ToString()
+            {
+                return string.Format("[NodeType:{0}, LinkingOperator:{1}]",
+                                        this.NodeType, this.LinkingOperator);
+            }
+        }
+
+        /// <summary>
+        /// 二叉 查询表达式
+        /// </summary>
+        /// <remarks>
+        /// 方便处理分组括号
+        /// </remarks>
+        internal class QueryBinaryExpression : QueryExpression
+        {
+            public QueryBinaryExpression()
+            {
+                NodeType = QueryExpressionType.Binary;
+            }
+
+            /// <summary>
+            /// 子节点
+            /// </summary>
+            public IList<QueryExpression> Nodes { get; set; }
+
+            public override string ToString()
+            {
+                return string.Format("[{0} ({1})]", base.ToString(), this.Nodes.Join2(","));
+            }
+        }
+
+        /// <summary>
+        /// 参数 查询表达式
+        /// </summary>
+        internal class QueryParameterExpression : QueryExpression
+        {
+            public QueryParameterExpression()
+            {
+                NodeType = QueryExpressionType.Parameter;
+            }
+
+            /// <summary>
+            ///     Initializes a new instance of the <see cref="QueryParameterExpression " /> class.
             /// </summary>
             /// <param name="linkingOperator">The linking operator.</param>
             /// <param name="propertyName">Name of the property.</param>
             /// <param name="propertyValue">The property value.</param>
             /// <param name="queryOperator">The query operator.</param>
             /// <param name="nestedProperty">Signilize if it is nested property.</param>
-            internal QueryParameter(string linkingOperator, string propertyName, object propertyValue, string queryOperator, bool nestedProperty)
+            internal QueryParameterExpression(string linkingOperator,
+                string propertyName, object propertyValue,
+                string queryOperator, bool nestedProperty) : this()
             {
                 LinkingOperator = linkingOperator;
                 PropertyName = propertyName;
@@ -310,11 +386,18 @@ namespace Dapper
                 NestedProperty = nestedProperty;
             }
 
-            public string LinkingOperator { get; set; }
             public string PropertyName { get; set; }
             public object PropertyValue { get; set; }
             public string QueryOperator { get; set; }
             public bool NestedProperty { get; set; }
+
+            public override string ToString()
+            {
+                return string.Format("[{0}, PropertyName:{1}, PropertyValue:{2}, QueryOperator:{3}, NestedProperty:{4}]",
+                    base.ToString(),
+                    this.PropertyName, this.PropertyValue,
+                    this.QueryOperator, this.NestedProperty);
+            }
         }
 
         private class SqlQuery
@@ -328,54 +411,131 @@ namespace Dapper
             public ISqlAdapter Adapter { get; set; }
             public List<PropertyInfoWrapper> Properties { get; set; }
 
-            public SqlQuery GetWhereQuery(Expression<Func<TEntity, bool>> predicate)
+            public SqlQuery GetWhereQuery(Expression<Func<TEntity, bool>> wherePredicate)
             {
                 var dictionary = new List<KeyValuePair<string, object>>();
 
                 var sqlQuery = new SqlQuery();
-                if (predicate == null)
+                if (wherePredicate == null)
                     return sqlQuery;
 
                 // WHERE
-                var queryProperties = new List<QueryParameter>();
-                FillQueryProperties(predicate.Body, ExpressionType.Default, ref queryProperties);
+                IList<QueryExpression> queryProperties = new List<QueryExpression>();
+                FillQueryProperties(wherePredicate.Body, ref queryProperties);
 
                 if (queryProperties.Count <= 0)
                     return sqlQuery;
 
                 var adapter = this.Adapter;
+
+                IList<KeyValuePair<string, object>> conditions = new List<KeyValuePair<string, object>>();
                 var sqlBuilder = new StringBuilder();
                 sqlBuilder.Append(" WHERE ");
-                for (var i = 0; i < queryProperties.Count; i++)
-                {
-                    var item = queryProperties[i];
-                    var columnName = Properties.First(x => x.Name == item.PropertyName).Name;
-
-                    if (!string.IsNullOrEmpty(item.LinkingOperator) && i > 0)
-                        sqlBuilder.Append(item.LinkingOperator).Append(" ");
-
-                    if (item.PropertyValue == null)
-                        sqlBuilder.AppendFormat("{0} IS{1} NULL ", adapter.AppendColumnName(columnName), item.QueryOperator == "=" ? "" : " NOT");
-                    else
-                    {
-                        sqlBuilder.AppendFormat("{0} {1} @{2} ", adapter.AppendColumnName(columnName), item.QueryOperator, item.PropertyName);
-                        dictionary.Add(new KeyValuePair<string, object>(item.PropertyName, item.PropertyValue));
-                    }
-                }
+                var qLevel = 0;
+                BuildQuerySql(queryProperties, ref sqlBuilder, ref conditions, ref qLevel);
 
                 sqlQuery.SqlBuilder = sqlBuilder.ToString();
-                sqlQuery.Condition = dictionary;
+                sqlQuery.Condition = conditions;
                 return sqlQuery;
             }
 
             /// <summary>
-            ///     Fill query properties
+            /// 构建最终 查询语句及参数
+            /// </summary>
+            /// <param name="queryProperties"></param>
+            /// <param name="sqlBuilder"></param>
+            /// <param name="conditions"></param>
+            /// <param name="qLevel">参数排名</param>
+            private void BuildQuerySql(IList<QueryExpression> queryProperties,
+               ref StringBuilder sqlBuilder, ref IList<KeyValuePair<string, object>> conditions, ref int qLevel)
+            {
+                var adapter = this.Adapter;
+                foreach (var expr in queryProperties)
+                {
+                    if (expr.LinkingOperator.HasValue())
+                    {
+                        if (sqlBuilder.Length > 0)
+                            sqlBuilder.Append(" ");
+                        sqlBuilder.Append(expr.LinkingOperator).Append(" ");
+                    }
+
+                    switch (expr)
+                    {
+                        case QueryParameterExpression qpExpr:
+                            var columnName = Properties.First(x => x.Name == qpExpr.PropertyName).Name;
+                            if (qpExpr.PropertyValue == null)
+                                sqlBuilder.AppendFormat("{0} IS{1} NULL", adapter.AppendColumnName(columnName), qpExpr.QueryOperator == "=" ? "" : " NOT");
+                            else
+                            {
+                                var vKey = "{0}_p{1}".Fmt(qpExpr.PropertyName, qLevel);
+                                sqlBuilder.AppendFormat("{0} {1} {2}", adapter.AppendColumnName(columnName), qpExpr.QueryOperator, vKey);
+                                conditions.Add(new KeyValuePair<string, object>(vKey, qpExpr.PropertyValue));
+                            }
+
+                            qLevel++;
+                            break;
+
+                        case QueryBinaryExpression qbExpr:
+                            var nSqlBuilder = new StringBuilder();
+                            IList<KeyValuePair<string, object>> nConditions = new List<KeyValuePair<string, object>>();
+                            BuildQuerySql(qbExpr.Nodes, ref nSqlBuilder, ref nConditions, ref qLevel);
+
+                            if (qbExpr.Nodes.Count == 1) //处理 `分组括号` 问题
+                                sqlBuilder.Append(nSqlBuilder);
+                            else
+                                sqlBuilder.AppendFormat("({0})", nSqlBuilder);
+
+                            conditions.AddRange(nConditions);
+                            break;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Fill query properties
+            /// </summary>
+            /// <param name="expr">The expression.</param>
+            /// <param name="queryProperties">The query properties.</param>
+            private void FillQueryProperties(Expression expr, ref IList<QueryExpression> queryProperties)
+            {
+                var queryNode = GetQueryProperties(expr, ExpressionType.Default);
+                switch (queryNode)
+                {
+                    case QueryParameterExpression qpExpr:
+                        queryProperties = new List<QueryExpression>() { queryNode };
+                        return;
+
+                    case QueryBinaryExpression qbExpr:
+                        queryProperties = qbExpr.Nodes;
+                        return;
+
+                    default:
+                        throw new NotSupportedException(queryNode.ToString());
+                }
+            }
+
+            /// <summary>
+            /// get query properties
             /// </summary>
             /// <param name="expr">The expression.</param>
             /// <param name="linkingType">Type of the linking.</param>
-            /// <param name="queryProperties">The query properties.</param>
-            private void FillQueryProperties(Expression expr, ExpressionType linkingType, ref List<QueryParameter> queryProperties)
+            private QueryExpression GetQueryProperties(Expression expr, ExpressionType linkingType)
             {
+                #region 适配一元 NOT 运算符
+
+                var isNotUnary = false;
+                if (expr is UnaryExpression)
+                {
+                    var innerbody = (UnaryExpression)expr;
+                    if (innerbody.NodeType == ExpressionType.Not && innerbody.Operand is MethodCallExpression)
+                    {
+                        expr = innerbody.Operand;
+                        isNotUnary = true;
+                    }
+                }
+
+                #endregion
+
                 var body = expr as MethodCallExpression;
                 if (body != null)
                 {
@@ -392,10 +552,9 @@ namespace Dapper
                                     throw new NotImplementedException("predicate can't parse");
 
                                 var propertyValue = ExpressionHelper.GetValuesFromCollection(innerBody);
-                                var opr = ExpressionHelper.GetMethodCallSqlOperator(methodName);
+                                var opr = ExpressionHelper.GetMethodCallSqlOperator(methodName, isNotUnary);
                                 var link = ExpressionHelper.GetSqlOperator(linkingType);
-                                queryProperties.Add(new QueryParameter(link, propertyName, propertyValue, opr, isNested));
-                                break;
+                                return new QueryParameterExpression(link, propertyName, propertyValue, opr, isNested);
                             }
 
                         default:
@@ -417,17 +576,96 @@ namespace Dapper
                         var opr = ExpressionHelper.GetSqlOperator(innerbody.NodeType);
                         var link = ExpressionHelper.GetSqlOperator(linkingType);
 
-                        queryProperties.Add(new QueryParameter(link, propertyName, propertyValue, opr, isNested));
+                        return new QueryParameterExpression(link, propertyName, propertyValue, opr, isNested);
                     }
                     else
                     {
-                        FillQueryProperties(innerbody.Left, innerbody.NodeType, ref queryProperties);
-                        FillQueryProperties(innerbody.Right, innerbody.NodeType, ref queryProperties);
+                        var leftExpr = GetQueryProperties(innerbody.Left, ExpressionType.Default);
+                        var rightExpr = GetQueryProperties(innerbody.Right, innerbody.NodeType);
+
+                        #region 剥离层级分组括号
+
+                        switch (leftExpr)
+                        {
+                            case QueryParameterExpression lQPExpr:
+                                if (!string.IsNullOrEmpty(lQPExpr.LinkingOperator) && !string.IsNullOrEmpty(rightExpr.LinkingOperator)) // AND a AND B
+                                {
+                                    switch (rightExpr)
+                                    {
+                                        case QueryBinaryExpression rQBExpr:
+                                            if (lQPExpr.LinkingOperator == rQBExpr.Nodes.Last().LinkingOperator) // AND a AND (c AND d)
+                                            {
+                                                var nodes = new QueryBinaryExpression
+                                                {
+                                                    LinkingOperator = leftExpr.LinkingOperator,
+                                                    Nodes = new List<QueryExpression> { leftExpr }
+                                                };
+
+                                                rQBExpr.Nodes[0].LinkingOperator = rQBExpr.LinkingOperator;
+                                                nodes.Nodes.AddRange(rQBExpr.Nodes);
+
+                                                leftExpr = nodes;
+                                                rightExpr = null;
+                                                // AND a AND (c AND d) => (AND a AND c AND d)
+                                            }
+                                            break;
+                                    }
+                                }
+                                break;
+
+                            case QueryBinaryExpression lQBExpr:
+                                switch (rightExpr)
+                                {
+                                    case QueryParameterExpression rQPExpr:
+                                        if (rQPExpr.LinkingOperator == lQBExpr.Nodes.Last().LinkingOperator)    //(a AND b) AND c
+                                        {
+                                            lQBExpr.Nodes.Add(rQPExpr);
+                                            rightExpr = null;
+                                            //(a AND b) AND c => (a AND b AND c)
+                                        }
+                                        break;
+
+                                    case QueryBinaryExpression rQBExpr:
+                                        if (lQBExpr.Nodes.Last().LinkingOperator == rQBExpr.LinkingOperator) // (a AND b) AND (c AND d)
+                                        {
+                                            if (rQBExpr.LinkingOperator == rQBExpr.Nodes.Last().LinkingOperator)   // AND (c AND d)
+                                            {
+                                                rQBExpr.Nodes[0].LinkingOperator = rQBExpr.LinkingOperator;
+                                                lQBExpr.Nodes.AddRange(rQBExpr.Nodes);
+                                                // (a AND b) AND (c AND d) =>  (a AND b AND c AND d)
+                                            }
+                                            else
+                                            {
+                                                lQBExpr.Nodes.Add(rQBExpr);
+                                                // (a AND b) AND (c OR d) =>  (a AND b AND (c OR d))
+                                            }
+                                            rightExpr = null;
+                                        }
+                                        break;
+                                }
+                                break;
+                        }
+
+                        #endregion
+
+                        var nLinkingOperator = ExpressionHelper.GetSqlOperator(linkingType);
+                        if (rightExpr == null)
+                        {
+                            leftExpr.LinkingOperator = nLinkingOperator;
+                            return leftExpr;
+                        }
+
+                        return new QueryBinaryExpression
+                        {
+                            NodeType = QueryExpressionType.Binary,
+                            LinkingOperator = nLinkingOperator,
+                            Nodes = new List<QueryExpression> { leftExpr, rightExpr },
+                        };
                     }
                 }
                 else
                 {
-                    FillQueryProperties(ExpressionHelper.GetBinaryExpression(expr), linkingType, ref queryProperties);
+                    return GetQueryProperties(ExpressionHelper.GetBinaryExpression(expr), linkingType);
                 }
             }
         }

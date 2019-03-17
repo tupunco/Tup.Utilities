@@ -364,9 +364,8 @@ namespace Dapper
         /// Get data count from table with a specified condition.
         /// </summary>
         /// <param name="connection"></param>
-        /// <param name="condition"></param>
+        /// <param name="param"></param>
         /// <param name="table"></param>
-        /// <param name="isOr"></param>
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -381,9 +380,8 @@ namespace Dapper
         /// Get data count async from table with a specified condition.
         /// </summary>
         /// <param name="connection"></param>
-        /// <param name="condition"></param>
+        /// <param name="param"></param>
         /// <param name="table"></param>
-        /// <param name="isOr"></param>
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
@@ -619,6 +617,32 @@ namespace Dapper
             var adapter = GetFormatter(connection);
             var sql = adapter.PagedSql(adapter.AppendColumnName(table), orderBy,
                                         pageIndex, pageSize, whereSql, columns);
+            return connection.Query<T>(sql, param, transaction, true, commandTimeout);
+        }
+
+        /// <summary>
+        /// Query paged data from a single table.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereSql"></param>
+        /// <param name="param"></param>
+        /// <param name="querySql"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> QueryPagedBySql<T>(this IDbConnection connection, string whereSql, object param,
+            string querySql, string orderBy, int pageIndex, int pageSize,
+             IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            if (pageIndex <= 0)
+                pageIndex = 1;
+
+            var adapter = GetFormatter(connection);
+            var sql = adapter.PagedSql(querySql, orderBy, pageIndex, pageSize, whereSql, "*");
             return connection.Query<T>(sql, param, transaction, true, commandTimeout);
         }
 
@@ -1000,7 +1024,9 @@ namespace Dapper
         private static ISqlAdapter GetFormatter(IDbConnection connection)
         {
             var name = GetDatabaseType?.Invoke(connection).ToLower()
-                       ?? connection.GetType().Name.ToLower();
+                       ?? (connection is DbTransactionConnection
+                            ? (connection as DbTransactionConnection).InnerDbConnection
+                                : connection).GetType().Name.ToLower();
 
             return !AdapterDictionary.ContainsKey(name)
                 ? DefaultAdapter
@@ -1073,7 +1099,7 @@ namespace Dapper
             /// <returns></returns>
             public string PagedSql(string table, string orderBy, int pageIndex, int pageSize, string whereFields, string columns = "*")
             {
-                return string.Format(@"SELECT * FROM (SELECT ROW_NUMBER() OVER (ORDER BY {1}) AS RowNumber, {0} FROM {2} {3}) AS Total WHERE RowNumber BETWEEN {4} AND {5}",
+                return string.Format(@"SELECT * FROM (SELECT ROW_NUMBER() OVER (ORDER BY {1}) AS RowNumber, {0} FROM ({2}) {3}) AS Total WHERE RowNumber BETWEEN {4} AND {5}",
                     columns, orderBy, table, whereFields, (pageIndex - 1) * pageSize + 1, pageIndex * pageSize);
             }
 
@@ -1131,7 +1157,7 @@ namespace Dapper
             /// <returns></returns>
             public string PagedSql(string table, string orderBy, int pageIndex, int pageSize, string whereFields, string columns = "*")
             {
-                return string.Format("SELECT {0} FROM {2} {3} ORDER BY {1} LIMIT {4}, {5}",
+                return string.Format("SELECT {0} FROM ({2}) {3} ORDER BY {1} LIMIT {4}, {5}",
                                  columns, orderBy, table, whereFields,
                                  (pageIndex - 1) * pageSize, pageSize);
             }
@@ -1190,7 +1216,7 @@ namespace Dapper
             /// <returns></returns>
             public string PagedSql(string table, string orderBy, int pageIndex, int pageSize, string whereFields, string columns = "*")
             {
-                return string.Format("SELECT {0} FROM {2} {3} ORDER BY {1} LIMIT {4}, {5}",
+                return string.Format("SELECT {0} FROM ({2}) {3} ORDER BY {1} LIMIT {4}, {5}",
                                  columns, orderBy, table, whereFields,
                                  (pageIndex - 1) * pageSize, pageSize);
             }
