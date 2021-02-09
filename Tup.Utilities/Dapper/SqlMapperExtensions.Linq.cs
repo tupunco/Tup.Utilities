@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 using Tup.Utilities;
 
@@ -19,6 +21,73 @@ namespace Dapper
     /// </remarks>
     static partial class SqlMapperExtensions
     {
+        #region Sync
+
+        /// <summary>
+        /// Update data for table with a specified Expression.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="data"></param>
+        /// <param name="predicate"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static int Update<TResult>(this IDbConnection connection,
+            dynamic data, Expression<Func<TResult, bool>> predicate, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
+            where TResult : class
+        {
+            StringBuilder sqlSb;
+            DynamicParameters parameters;
+            InternalGetUpdateExprParam<TResult>(connection, data, predicate, table, out sqlSb, out parameters);
+
+            return connection.Execute(sqlSb.ToString(), parameters, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// Update data for table with a specified Expression.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="builder"></param>
+        /// <param name="predicate"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static int Update<TResult>(this IDbConnection connection,
+            UpdateBuilder<TResult> builder, Expression<Func<TResult, bool>> predicate, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
+            where TResult : class
+        {
+            StringBuilder sqlSb;
+            Dictionary<string, object> parameters;
+            InternalGetUpdateUBExprParam(connection, builder, predicate, table, out sqlSb, out parameters);
+
+            return connection.Execute(sqlSb.ToString(), parameters, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// Delete data from table with a specified Expression.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="predicate"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static int Delete<TResult>(this IDbConnection connection,
+            Expression<Func<TResult, bool>> predicate, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
+            where TResult : class
+        {
+            StringBuilder sqlSb;
+            object conditionObj;
+            InternalGetDeleteExprParam(connection, predicate, table, out sqlSb, out conditionObj);
+
+            return connection.Execute(sqlSb.ToString(), conditionObj, transaction, commandTimeout);
+        }
+
         /// <summary>
         /// QueryAll Expression
         /// </summary>
@@ -29,31 +98,241 @@ namespace Dapper
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static IEnumerable<TResult> QueryAll<TResult>(this IDbConnection connection, Expression<Func<TResult, bool>> predicate, string table, string columns = "*",
-            IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        public static IEnumerable<TResult> QueryAll<TResult>(this IDbConnection connection,
+            Expression<Func<TResult, bool>> predicate, string table, string columns = "*",
+            IDbTransaction transaction = null, int? commandTimeout = null)
             where TResult : class
         {
-            object conditionObj = null;
-            var properties = GetPropertyInfos<TResult>();
+            object conditionObj;
+            StringBuilder sqlSb;
+            InternalGetQueryAllExprParam(connection, predicate, table, columns, out conditionObj, out sqlSb);
+
+            return connection.Query<TResult>(sqlSb.ToString(), conditionObj,
+                transaction: transaction, commandTimeout: commandTimeout);
+        }
+
+        #endregion
+
+        #region Async
+
+        /// <summary>
+        /// Async Update data for table with a specified Expression.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="data"></param>
+        /// <param name="predicate"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static Task<int> UpdateAsync<TResult>(this IDbConnection connection,
+            dynamic data, Expression<Func<TResult, bool>> predicate, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
+            where TResult : class
+        {
+            StringBuilder sqlSb;
+            DynamicParameters parameters;
+            InternalGetUpdateExprParam<TResult>(connection, data, predicate, table, out sqlSb, out parameters);
+
+            return connection.ExecuteAsync(sqlSb.ToString(), parameters, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// Async Update data for table with a specified Expression.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="builder"></param>
+        /// <param name="predicate"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static Task<int> UpdateAsync<TResult>(this IDbConnection connection,
+            UpdateBuilder<TResult> builder, Expression<Func<TResult, bool>> predicate, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
+            where TResult : class
+        {
+            StringBuilder sqlSb;
+            Dictionary<string, object> parameters;
+            InternalGetUpdateUBExprParam(connection, builder, predicate, table, out sqlSb, out parameters);
+
+            return connection.ExecuteAsync(sqlSb.ToString(), parameters, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// Async Delete data from table with a specified Expression.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="predicate"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static Task<int> DeleteAsync<TResult>(this IDbConnection connection,
+            Expression<Func<TResult, bool>> predicate, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
+            where TResult : class
+        {
+            StringBuilder sqlSb;
+            object conditionObj;
+            InternalGetDeleteExprParam(connection, predicate, table, out sqlSb, out conditionObj);
+
+            return connection.ExecuteAsync(sqlSb.ToString(), conditionObj, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// Async QueryAll Expression
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="predicate"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static Task<IEnumerable<TResult>> QueryAllAsync<TResult>(this IDbConnection connection,
+            Expression<Func<TResult, bool>> predicate, string table, string columns = "*",
+            IDbTransaction transaction = null, int? commandTimeout = null)
+            where TResult : class
+        {
+            object conditionObj;
+            StringBuilder sqlSb;
+            InternalGetQueryAllExprParam(connection, predicate, table, columns, out conditionObj, out sqlSb);
+
+            return connection.QueryAsync<TResult>(sqlSb.ToString(), conditionObj,
+                transaction: transaction, commandTimeout: commandTimeout);
+        }
+
+        #endregion
+
+        #region InternalGet****ExprParam
+
+        private static void InternalGetUpdateExprParam<TResult>(IDbConnection connection,
+            dynamic data, Expression<Func<TResult, bool>> predicate, string table,
+            out StringBuilder sqlSb, out DynamicParameters parameters) where TResult : class
+        {
+            ThrowHelper.ThrowIfNull(connection, "connection");
+            ThrowHelper.ThrowIfNull(data, "data");
+            ThrowHelper.ThrowIfNull(predicate, "predicate");
+            ThrowHelper.ThrowIfNull(table, "table");
+
+            var obj = data as object;
             var adapter = GetFormatter(connection);
-            var sqlGenerator = new SqlGenerator<TResult>()
-            {
-                Properties = properties,
-                Adapter = adapter,
-            };
+            var updatePropertyInfos = GetPropertyInfos(obj).Where(x => !x.Created/*更新时 添加字段 删除*/ && !x.Key);
+            var updateProperties = updatePropertyInfos.Select(p => p.Name);
+            var updateFields = string.Join(",", updateProperties.Select(p => adapter.AppendColumnNameEqualsValue(p)));
+
+            sqlSb = new StringBuilder();
+            sqlSb.AppendFormat("UPDATE {0} SET {1}", adapter.AppendColumnName(table), updateFields);
+
+            #region where
+
+            var wherePropertyInfos = GetPropertyInfos<TResult>();
+            var sqlGenerator = new SqlGenerator<TResult>(adapter, wherePropertyInfos);
             var sqlQuery = sqlGenerator.GetWhereQuery(predicate);
 
-            var sqlSb = new StringBuilder();
+            IList<KeyValuePair<string, object>> conditionObj = null;
+            if (sqlQuery != null && sqlQuery.SqlBuilder != null && sqlQuery.Condition != null)
+            {
+                sqlSb.Append(sqlQuery.SqlBuilder);
+                conditionObj = sqlQuery.Condition as IList<KeyValuePair<string, object>>; //IList<KeyValuePair<string, object>>
+            }
+
+            #endregion
+
+            parameters = new DynamicParameters(data);
+            if (conditionObj != null)
+            {
+                var expandoObject = new ExpandoObject() as IDictionary<string, object>;
+                conditionObj.ForEach(p => expandoObject.Add(p.Key, p.Value));
+                parameters.AddDynamicParams(expandoObject);
+            }
+        }
+
+        private static void InternalGetUpdateUBExprParam<TResult>(IDbConnection connection,
+            UpdateBuilder<TResult> builder, Expression<Func<TResult, bool>> predicate, string table,
+            out StringBuilder sqlSb, out Dictionary<string, object> parameters) where TResult : class
+        {
+            ThrowHelper.ThrowIfNull(connection, "connection");
+            ThrowHelper.ThrowIfNull(builder, "builder");
+            ThrowHelper.ThrowIfNull(predicate, "predicate");
+            ThrowHelper.ThrowIfNull(table, "table");
+
+            var adapter = GetFormatter(connection);
+            var data = builder.ToDictionary();
+            var updateProperties = data.Select(p => p.Key);
+            var updateFields = string.Join(",", updateProperties.Select(p => adapter.AppendColumnNameEqualsValue(p)));
+
+            sqlSb = new StringBuilder();
+            sqlSb.AppendFormat("UPDATE {0} SET {1}", adapter.AppendColumnName(table), updateFields);
+
+            #region where
+
+            var wherePropertyInfos = GetPropertyInfos<TResult>();
+            var sqlGenerator = new SqlGenerator<TResult>(adapter, wherePropertyInfos);
+            var sqlQuery = sqlGenerator.GetWhereQuery(predicate);
+
+            IList<KeyValuePair<string, object>> conditionObj = null;
+            if (sqlQuery != null && sqlQuery.SqlBuilder != null && sqlQuery.Condition != null)
+            {
+                sqlSb.Append(sqlQuery.SqlBuilder);
+                conditionObj = sqlQuery.Condition as IList<KeyValuePair<string, object>>; //IList<KeyValuePair<string, object>>
+            }
+
+            #endregion
+
+            parameters = new Dictionary<string, object>(data);
+            if (conditionObj != null)
+                parameters.AddRange(conditionObj);
+        }
+
+        private static void InternalGetDeleteExprParam<TResult>(IDbConnection connection,
+            Expression<Func<TResult, bool>> predicate, string table,
+            out StringBuilder sqlSb, out object conditionObj) where TResult : class
+        {
+            ThrowHelper.ThrowIfNull(connection, "connection");
+            ThrowHelper.ThrowIfNull(predicate, "predicate");
+            ThrowHelper.ThrowIfNull(table, "table");
+
+            var properties = GetPropertyInfos<TResult>();
+            var adapter = GetFormatter(connection);
+            var sqlGenerator = new SqlGenerator<TResult>(adapter, properties);
+            var sqlQuery = sqlGenerator.GetWhereQuery(predicate);
+
+            sqlSb = new StringBuilder();
+            conditionObj = null;
+            sqlSb.AppendFormat("DELETE FROM {0}", adapter.AppendColumnName(table));
+            if (sqlQuery != null && sqlQuery.SqlBuilder != null && sqlQuery.Condition != null)
+            {
+                sqlSb.Append(sqlQuery.SqlBuilder);
+                conditionObj = sqlQuery.Condition;
+            }
+        }
+
+        private static void InternalGetQueryAllExprParam<TResult>(IDbConnection connection,
+            Expression<Func<TResult, bool>> predicate, string table, string columns,
+            out object conditionObj, out StringBuilder sqlSb) where TResult : class
+        {
+            ThrowHelper.ThrowIfNull(connection, "connection");
+            ThrowHelper.ThrowIfNull(predicate, "predicate");
+            ThrowHelper.ThrowIfNull(table, "table");
+
+            conditionObj = null;
+            var properties = GetPropertyInfos<TResult>();
+            var adapter = GetFormatter(connection);
+            var sqlGenerator = new SqlGenerator<TResult>(adapter, properties);
+            var sqlQuery = sqlGenerator.GetWhereQuery(predicate);
+
+            sqlSb = new StringBuilder();
             sqlSb.AppendFormat("SELECT {1} FROM {0}", adapter.AppendColumnName(table), columns);
             if (sqlQuery != null && sqlQuery.SqlBuilder != null && sqlQuery.Condition != null)
             {
                 sqlSb.Append(sqlQuery.SqlBuilder);
                 conditionObj = sqlQuery.Condition;
             }
-
-            return connection.Query<TResult>(sqlSb.ToString(), conditionObj,
-                transaction: transaction, commandTimeout: commandTimeout, commandType: commandType);
         }
+
+        #endregion
 
         #region Linq/Expression
 
@@ -62,66 +341,56 @@ namespace Dapper
         /// </summary>
         internal static class ExpressionHelper
         {
-            //public static string GetPropertyName<TSource, TField>(Expression<Func<TSource, TField>> field)
-            //{
-            //    if (Equals(field, null))
-            //        throw new NullReferenceException("Field is required");
-
-            //    MemberExpression expr;
-
-            //    var body = field.Body as MemberExpression;
-            //    if (body != null)
-            //    {
-            //        expr = body;
-            //    }
-            //    else
-            //    {
-            //        var expression = field.Body as UnaryExpression;
-            //        if (expression != null)
-            //            expr = (MemberExpression)expression.Operand;
-            //        else
-            //            throw new ArgumentException("Expression" + field + " is not supported.", nameof(field));
-            //    }
-
-            //    return expr.Member.Name;
-            //}
-
             public static object GetValue(Expression member)
             {
-                switch (member.NodeType)
-                {
-                    //FROM:https://github.com/aspnet/EntityFramework/blob/dev/src/EFCore/Query/ExpressionVisitors/Internal/ParameterExtractingExpressionVisitor.cs#L420
-                    case ExpressionType.Constant:
-                        return ((ConstantExpression)member).Value;
+                return GetValue(member, out _);
+            }
 
-                    case ExpressionType.MemberAccess:
-                        var memberExpression = (MemberExpression)member;
-                        var @object = GetValue(memberExpression.Expression);
-                        if (memberExpression.Member is FieldInfo)
+            private static object GetValue(Expression member, out string parameterName)
+            {
+                parameterName = null;
+
+                if (member == null)
+                    return null;
+
+                switch (member)
+                {
+                    //FROM:https://github.com/dotnet/efcore/blob/master/src/EFCore/Query/Internal/ParameterExtractingExpressionVisitor.cs#L370
+                    case ConstantExpression constantExpression:
+                        return constantExpression.Value;
+
+                    case MemberExpression memberExpression:
+                        var @object = GetValue(memberExpression.Expression, out parameterName);
+                        try
                         {
-                            var fieldInfo = memberExpression.Member as FieldInfo;
-                            try
+                            switch (memberExpression.Member)
                             {
-                                return fieldInfo.GetValue(@object);
-                            }
-                            catch
-                            {
-                                // Try again when we compile the delegate
+                                case FieldInfo fieldInfo:
+                                    parameterName = (parameterName != null ? parameterName + "_" : "") + fieldInfo.Name;
+                                    return fieldInfo.GetValue(@object);
+
+                                case PropertyInfo propertyInfo:
+                                    parameterName = (parameterName != null ? parameterName + "_" : "") + propertyInfo.Name;
+                                    return propertyInfo.GetValue(@object);
                             }
                         }
-                        if (memberExpression.Member is PropertyInfo)
+                        catch (Exception ex)
                         {
-                            var propertyInfo = memberExpression.Member as PropertyInfo;
-                            try
-                            {
-                                return propertyInfo.GetValue(@object);
-                            }
-                            catch
-                            {
-                                // Try again when we compile the delegate
-                            }
+                            Logger.ErrorFormat("ExpressionHelper.GetValue-Member:{0}-@object:{1}-member:{2}-ex:{3}",
+                                                    memberExpression.Member, @object, member, ex);
+                            // Try again when we compile the delegate
                         }
                         break;
+
+                    case MethodCallExpression methodCallExpression:
+                        parameterName = methodCallExpression.Method.Name;
+                        break;
+
+                    case UnaryExpression unaryExpression
+                        when (unaryExpression.NodeType == ExpressionType.Convert
+                            || unaryExpression.NodeType == ExpressionType.ConvertChecked)
+                        && (unaryExpression.Type.UnwrapNullableType() == unaryExpression.Operand.Type):
+                        return GetValue(unaryExpression.Operand, out parameterName);
                 }
 
                 return Expression.Lambda<Func<object>>(Expression.Convert(member, typeof(object)))
@@ -169,10 +438,38 @@ namespace Dapper
                 }
             }
 
+            public static string GetSqlLikeValue(string methodName, object value)
+            {
+                if (value == null)
+                    value = string.Empty;
+
+                switch (methodName)
+                {
+                    case "StartsWith":
+                        return "{0}%".Fmt(value);
+
+                    case "EndsWith":
+                        return "%{0}".Fmt(value);
+
+                    case "StringContains":
+                        return "%{0}%".Fmt(value);
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+
             public static string GetMethodCallSqlOperator(string methodName, bool isNotUnary = false)
             {
                 switch (methodName)
                 {
+                    case "SqlLike":
+                    case "Like":
+                    case "StartsWith":
+                    case "EndsWith":
+                    case "StringContains":
+                        return isNotUnary ? "NOT LIKE" : "LIKE";
+
                     case "Contains":
                         return isNotUnary ? "NOT IN" : "IN";
 
@@ -204,61 +501,65 @@ namespace Dapper
 
             public static object GetValuesFromCollection(MethodCallExpression callExpr)
             {
-                var expr = callExpr.Object as MemberExpression;
+                var expr = (callExpr.Method.IsStatic ? callExpr.Arguments.First() : callExpr.Object)
+                                as MemberExpression;
 
-                if (!(expr?.Expression is ConstantExpression))
+                try
+                {
+                    return GetValue(expr);
+                }
+                catch (Exception ex)
+                {
+                    Logger.ErrorFormat("ExpressionHelper.GetValuesFromCollection-expr:{0}-ex:{1}", expr, ex);
+
                     throw new NotImplementedException($"{callExpr.Method.Name} is not implemented");
+                }
+            }
 
-                var constExpr = (ConstantExpression)expr.Expression;
+            public static object GetValuesFromStringMethod(MethodCallExpression callExpr)
+            {
+                var expr = callExpr.Method.IsStatic ? callExpr.Arguments[1] : callExpr.Arguments[0];
 
-                var constExprType = constExpr.Value.GetType();
-                return constExprType.GetField(expr.Member.Name).GetValue(constExpr.Value);
+                return GetValue(expr);
             }
 
             public static MemberExpression GetMemberExpression(Expression expression)
             {
-                var expr = expression as MethodCallExpression;
-                if (expr != null)
+                switch (expression)
                 {
-                    if (expr.Method.IsStatic)
-                        return (MemberExpression)expr.Arguments.Last();
-                    else
-                        return (MemberExpression)expr.Arguments[0];
-                }
+                    case MethodCallExpression expr:
+                        if (expr.Method.IsStatic)
+                            return (MemberExpression)expr.Arguments.Last(x => x.NodeType == ExpressionType.MemberAccess);
+                        else
+                            return (MemberExpression)expr.Arguments[0];
 
-                var memberExpression = expression as MemberExpression;
-                if (memberExpression != null)
-                    return memberExpression;
+                    case MemberExpression memberExpression:
+                        return memberExpression;
 
-                var unaryExpression = expression as UnaryExpression;
-                if (unaryExpression != null)
-                    return (MemberExpression)unaryExpression.Operand;
+                    case UnaryExpression unaryExpression:
+                        return (MemberExpression)unaryExpression.Operand;
 
-                var binaryExpression = expression as BinaryExpression;
-                if (binaryExpression != null)
-                {
-                    var binaryExpr = binaryExpression;
+                    case BinaryExpression binaryExpression:
+                        var binaryExpr = binaryExpression;
 
-                    var left = binaryExpr.Left as UnaryExpression;
-                    if (left != null)
-                        return (MemberExpression)left.Operand;
+                        if (binaryExpr.Left is UnaryExpression left)
+                            return (MemberExpression)left.Operand;
 
-                    //should we take care if right operation is memberaccess, not left ?
-                    return (MemberExpression)binaryExpr.Left;
-                }
+                        //should we take care if right operation is memberaccess, not left?
+                        return (MemberExpression)binaryExpr.Left;
 
-                var expression1 = expression as LambdaExpression;
-                if (expression1 != null)
-                {
-                    var lambdaExpression = expression1;
+                    case LambdaExpression expression1:
+                        var lambdaExpression = expression1;
 
-                    var body = lambdaExpression.Body as MemberExpression;
-                    if (body != null)
-                        return body;
+                        switch (lambdaExpression.Body)
+                        {
+                            case MemberExpression body:
+                                return body;
 
-                    var expressionBody = lambdaExpression.Body as UnaryExpression;
-                    if (expressionBody != null)
-                        return (MemberExpression)expressionBody.Operand;
+                            case UnaryExpression expressionBody:
+                                return (MemberExpression)expressionBody.Operand;
+                        }
+                        break;
                 }
 
                 return null;
@@ -408,8 +709,21 @@ namespace Dapper
 
         private class SqlGenerator<TEntity> where TEntity : class
         {
-            public ISqlAdapter Adapter { get; set; }
-            public List<PropertyInfoWrapper> Properties { get; set; }
+            public ISqlAdapter Adapter { get; private set; }
+            public IList<PropertyInfoWrapper> Properties { get; private set; }
+            public ICollection<string> PropertieNames { get; private set; }
+
+            /// <summary>
+            ///
+            /// </summary>
+            /// <param name="adapter"></param>
+            /// <param name="properties"></param>
+            public SqlGenerator(ISqlAdapter adapter, IList<PropertyInfoWrapper> properties)
+            {
+                this.Adapter = adapter;
+                this.Properties = properties;
+                this.PropertieNames = properties.Select(x => x.Name).ToSet();
+            }
 
             public SqlQuery GetWhereQuery(Expression<Func<TEntity, bool>> wherePredicate)
             {
@@ -462,13 +776,13 @@ namespace Dapper
                     switch (expr)
                     {
                         case QueryParameterExpression qpExpr:
-                            var columnName = Properties.First(x => x.Name == qpExpr.PropertyName).Name;
+                            var columnName = qpExpr.PropertyName;
                             if (qpExpr.PropertyValue == null)
                                 sqlBuilder.AppendFormat("{0} IS{1} NULL", adapter.AppendColumnName(columnName), qpExpr.QueryOperator == "=" ? "" : " NOT");
                             else
                             {
                                 var vKey = "{0}_p{1}".Fmt(qpExpr.PropertyName, qLevel);
-                                sqlBuilder.AppendFormat("{0} {1} {2}", adapter.AppendColumnName(columnName), qpExpr.QueryOperator, vKey);
+                                sqlBuilder.AppendFormat("{0} {1} {2}", adapter.AppendColumnName(columnName), qpExpr.QueryOperator, adapter.AppendColumnNameValue(vKey));
                                 conditions.Add(new KeyValuePair<string, object>(vKey, qpExpr.PropertyValue));
                             }
 
@@ -541,14 +855,23 @@ namespace Dapper
                 {
                     var innerBody = body;
                     var methodName = innerBody.Method.Name;
+                    MethodLabel:
                     switch (methodName)
                     {
                         case "Contains":
                             {
+                                if (innerBody.Object != null
+                                    && innerBody.Object.NodeType == ExpressionType.MemberAccess
+                                    && innerBody.Object.Type == typeof(string))
+                                {
+                                    methodName = "StringContains";
+                                    goto MethodLabel;
+                                }
+
                                 bool isNested = false;
                                 var propertyName = ExpressionHelper.GetPropertyNamePath(innerBody, out isNested);
 
-                                if (!Properties.Select(x => x.Name).Contains(propertyName))
+                                if (!PropertieNames.Contains(propertyName))
                                     throw new NotImplementedException("predicate can't parse");
 
                                 var propertyValue = ExpressionHelper.GetValuesFromCollection(innerBody);
@@ -556,7 +879,43 @@ namespace Dapper
                                 var link = ExpressionHelper.GetSqlOperator(linkingType);
                                 return new QueryParameterExpression(link, propertyName, propertyValue, opr, isNested);
                             }
+                        case "StringContains":
+                        case "StartsWith":
+                        case "EndsWith":
+                            {
+                                if (innerBody.Object == null
+                                    || innerBody.Object.NodeType != ExpressionType.MemberAccess
+                                    || innerBody.Object.Type != typeof(string))
+                                {
+                                    goto default;
+                                }
 
+                                bool isNested = false;
+                                var propertyName = ExpressionHelper.GetPropertyNamePath(innerBody.Object, out isNested);
+
+                                if (!PropertieNames.Contains(propertyName))
+                                    throw new NotImplementedException("wherePredicate can't parse");
+
+                                var propertyValue = ExpressionHelper.GetValuesFromStringMethod(innerBody);
+                                var likeValue = ExpressionHelper.GetSqlLikeValue(methodName, propertyValue);
+                                var opr = ExpressionHelper.GetMethodCallSqlOperator(methodName, isNotUnary);
+                                var link = ExpressionHelper.GetSqlOperator(linkingType);
+                                return new QueryParameterExpression(link, propertyName, likeValue, opr, isNested);
+                            }
+                        case "SqlLike":
+                        case "Like":
+                            {
+                                bool isNested = false;
+                                var propertyName = ExpressionHelper.GetPropertyNamePath(innerBody, out isNested);
+
+                                if (!PropertieNames.Contains(propertyName))
+                                    throw new NotImplementedException("wherePredicate can't parse");
+
+                                var propertyValue = ExpressionHelper.GetValuesFromStringMethod(innerBody);
+                                var opr = ExpressionHelper.GetMethodCallSqlOperator(methodName, isNotUnary);
+                                var link = ExpressionHelper.GetSqlOperator(linkingType);
+                                return new QueryParameterExpression(link, propertyName, propertyValue, opr, isNested);
+                            }
                         default:
                             throw new NotImplementedException($"'{methodName}' method is not implemented");
                     }
@@ -569,7 +928,7 @@ namespace Dapper
                         bool isNested = false;
                         var propertyName = ExpressionHelper.GetPropertyNamePath(innerbody, out isNested);
 
-                        if (!Properties.Select(x => x.Name).Contains(propertyName))
+                        if (!PropertieNames.Contains(propertyName))
                             throw new NotImplementedException("predicate can't parse");
 
                         var propertyValue = ExpressionHelper.GetValue(innerbody.Right);

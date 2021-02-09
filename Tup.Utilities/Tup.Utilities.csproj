@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Tup.Utilities</RootNamespace>
     <AssemblyName>Tup.Utilities</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>
     </StartupObject>
@@ -41,9 +41,10 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET_4</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,24 +53,56 @@
     <DefineConstants>TRACE;NET_4</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dapper, Version=1.60.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.1.60.6\lib\net451\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Com\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BatchHelper.cs" />
+    <Compile Include="AsyncHelper.cs" />
+    <Compile Include="Common\BizResult.cs" />
+    <Compile Include="ConfigHelper.cs" />
+    <Compile Include="Dapper\DbTransactionConnection.cs" />
+    <Compile Include="Dapper\SqlMapperExtensions.cs" />
+    <Compile Include="Dapper\SqlMapperExtensions.Linq.cs" />
+    <Compile Include="Dapper\SqlMethods.cs" />
+    <Compile Include="Dapper\UpdateBuilder.cs" />
+    <Compile Include="Data\BaseDao.cs" />
+    <Compile Include="Data\IServiceTransaction.cs" />
+    <Compile Include="Data\FieldHelper.cs" />
+    <Compile Include="MimeTypeMap.cs" />
+    <Compile Include="Data\RetryHelper.cs" />
+    <Compile Include="Reflection\ActivatorHelper.cs" />
+    <Compile Include="Reflection\PropertyHelper.cs" />
+    <Compile Include="Security\Base32.cs" />
+    <Compile Include="Security\Base64.cs" />
+    <Compile Include="Security\CryptHelper.cs" />
+    <Compile Include="Security\Fnv\FnvHash.cs" />
+    <Compile Include="Security\Fnv\FnvHelper.cs" />
+    <Compile Include="Security\Totp\Rfc6238AuthenticationService.cs" />
+    <Compile Include="Security\Totp\TotpHelper.cs" />
+    <Compile Include="Data\BatchHelper.cs" />
     <Compile Include="CollectionHelper.cs" />
-    <Compile Include="ConcurrentConsumerQueue.cs" />
+    <Compile Include="Common\ConcurrentConsumerQueue.cs" />
     <Compile Include="DateTimeHelper.cs" />
     <Compile Include="DbWrapper\DbCommandWrapper.cs">
       <SubType>Component</SubType>
@@ -80,7 +113,7 @@
     <Compile Include="DbWrapper\DbProviderFactoryWrapper.cs" />
     <Compile Include="DbWrapper\DbTransactionWrapper.cs" />
     <Compile Include="EnumHelper.cs" />
-    <Compile Include="HashSet.cs" />
+    <Compile Include="Common\HashSet.cs" />
     <Compile Include="JsonHelper.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ILoggerFactory.cs" />
@@ -90,7 +123,8 @@
     <Compile Include="Logging\Null\NullLogFactory.cs" />
     <Compile Include="Logging\Null\NullLogger.cs" />
     <Compile Include="ProcessHelper.cs" />
-    <Compile Include="ReflectionHelper.cs" />
+    <Compile Include="Reflection\ReflectionHelper.cs" />
+    <Compile Include="Common\SerializableDictionary.cs" />
     <Compile Include="StreamHelper.cs" />
     <Compile Include="ThreadHelper.cs" />
     <Compile Include="Wcf\MessageBase.cs" />
@@ -113,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

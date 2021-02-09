@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Tup.Utilities
 {
     /// <summary>
-    /// Reflection Helper
+    /// 反射 Helper
     /// </summary>
     public static class ReflectionHelper
     {
+        #region PropertiesCache
+
         /// <summary>
         /// TypePair
         /// </summary>
@@ -59,8 +62,6 @@ namespace Tup.Utilities
             }
         }
 
-        #region 扩展
-
         private static readonly ConcurrentDictionary<TypePair, PropertyInfo[]> s_PropertiesCache
                                            = new ConcurrentDictionary<TypePair, PropertyInfo[]>();
 
@@ -85,7 +86,103 @@ namespace Tup.Utilities
             return s_PropertiesCache.GetOrAdd(new TypePair(type, flags), t => type.GetProperties(flags));
         }
 
-        #endregion 扩展
+        #endregion
+
+        #region Nullable
+
+        //FROM:https://github.com/dotnet/efcore/blob/master/src/Shared/SharedTypeExtensions.cs#L38
+
+        public static Type UnwrapNullableType(this Type type) => Nullable.GetUnderlyingType(type) ?? type;
+
+        public static bool IsNullableValueType(this Type type)
+                    => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+
+        public static bool IsNullableType(this Type type)
+            => !type.IsValueType || type.IsNullableValueType();
+
+        public static bool IsNumeric(this Type type)
+        {
+            type = type.UnwrapNullableType();
+
+            return type.IsInteger()
+                || type == typeof(decimal)
+                || type == typeof(float)
+                || type == typeof(double);
+        }
+
+        public static bool IsInteger(this Type type)
+        {
+            type = type.UnwrapNullableType();
+
+            return type == typeof(int)
+                || type == typeof(long)
+                || type == typeof(short)
+                || type == typeof(byte)
+                || type == typeof(uint)
+                || type == typeof(ulong)
+                || type == typeof(ushort)
+                || type == typeof(sbyte)
+                || type == typeof(char);
+        }
+
+        #endregion
+
+        #region Expression
+
+        /// <summary>
+        /// GetPropertyName
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TField"></typeparam>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public static string GetPropertyName(this LambdaExpression field)
+        {
+            return InternalGetPropertyName(field);
+        }
+
+        /// <summary>
+        /// GetPropertyName
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TField"></typeparam>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        public static string GetPropertyName<TSource, TField>(this Expression<Func<TSource, TField>> field)
+        {
+            return InternalGetPropertyName(field);
+        }
+
+        /// <summary>
+        /// Internal GetPropertyName
+        /// </summary>
+        /// <param name="field">LambdaExpression</param>
+        /// <returns></returns>
+        private static string InternalGetPropertyName(LambdaExpression field)
+        {
+            if (Equals(field, null))
+                throw new ArgumentNullException(nameof(field), "field can't be null");
+
+            MemberExpression expr;
+
+            switch (field.Body)
+            {
+                case MemberExpression body:
+                    expr = body;
+                    break;
+
+                case UnaryExpression expression:
+                    expr = (MemberExpression)expression.Operand;
+                    break;
+
+                default:
+                    throw new ArgumentException("Expression field isn't supported", nameof(field));
+            }
+
+            return expr.Member.Name;
+        }
+
+        #endregion
     }
 }
 
@@ -102,7 +199,7 @@ namespace System.Reflection
     /// </summary>
     public static class AttributeExtensions
     {
-        #region APIs that return a single attribute
+#region APIs that return a single attribute
 
         public static Attribute GetCustomAttribute(this Assembly element, Type attributeType)
         {
@@ -164,9 +261,9 @@ namespace System.Reflection
             return (T)GetCustomAttribute(element, typeof(T), inherit);
         }
 
-        #endregion
+#endregion
 
-        #region APIs that return all attributes
+#region APIs that return all attributes
 
         public static IEnumerable<Attribute> GetCustomAttributes(this Assembly element)
         {
@@ -198,9 +295,9 @@ namespace System.Reflection
             return Attribute.GetCustomAttributes(element, inherit);
         }
 
-        #endregion
+#endregion
 
-        #region APIs that return all attributes of a particular type
+#region APIs that return all attributes of a particular type
 
         public static IEnumerable<Attribute> GetCustomAttributes(this Assembly element, Type attributeType)
         {
@@ -262,9 +359,9 @@ namespace System.Reflection
             return (IEnumerable<T>)GetCustomAttributes(element, typeof(T), inherit);
         }
 
-        #endregion
+#endregion
 
-        #region IsDefined
+#region IsDefined
 
         public static bool IsDefined(this Assembly element, Type attributeType)
         {
@@ -296,7 +393,7 @@ namespace System.Reflection
             return Attribute.IsDefined(element, attributeType, inherit);
         }
 
-        #endregion
+#endregion
     }
 
 #pragma warning restore CSE0003 // Use expression-bodied members

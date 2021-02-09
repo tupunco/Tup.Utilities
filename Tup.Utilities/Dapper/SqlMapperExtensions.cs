@@ -8,6 +8,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
+using Tup.Utilities;
+using Tup.Utilities.Logging;
+
+using PropertyAccessor = Tup.Utilities.PropertyHelper.PropertyAccessor;
+
 namespace Dapper
 {
     #region Dapper Attribute
@@ -42,31 +47,33 @@ namespace Dapper
         /// </summary>
         public object DefaultValue { get; set; }
 
-        public DKeyAttribute()
-        {
-        }
+        //public DKeyAttribute()
+        //{
+        //}
+    }
+
+    /// <summary>
+    /// Ignore 忽略 字段
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class DIgnoreAttribute : Attribute
+    {
     }
 
     /// <summary>
     /// Updated 更新时间 字段
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class DUpdatedAttribute : Attribute
     {
-        public DUpdatedAttribute()
-        {
-        }
     }
 
     /// <summary>
     /// Created 创建时间 字段
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class DCreatedAttribute : Attribute
     {
-        public DCreatedAttribute()
-        {
-        }
     }
 
     #endregion
@@ -81,6 +88,11 @@ namespace Dapper
     /// </remarks>
     public static partial class SqlMapperExtensions
     {
+        /// <summary>
+        /// Logger
+        /// </summary>
+        private static readonly ILogger Logger = LogManager.GetLogger(typeof(SqlMapperExtensions));
+
         private static readonly ConcurrentDictionary<Type, List<PropertyInfoWrapper>> _paramCache
                                                 = new ConcurrentDictionary<Type, List<PropertyInfoWrapper>>();
 
@@ -101,12 +113,12 @@ namespace Dapper
         {
             var conditionObj = condition as object;
             var whereFields = string.Empty;
-            var whereProperties = GetProperties(conditionObj);
+            var whereProperties = GetPropertyNames(conditionObj);
             var adapter = GetFormatter(connection);
 
             var sqlSb = new StringBuilder();
             sqlSb.AppendFormat("SELECT {1} FROM {0}", adapter.AppendColumnName(table), columns);
-            if (whereProperties.Count > 0)
+            if (whereProperties.Any())
             {
                 sqlSb.AppendFormat(" WHERE {0}", string.Join(" AND ",
                     whereProperties.Select(p => adapter.AppendColumnNameEqualsValue(p))));
@@ -133,19 +145,30 @@ namespace Dapper
             IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var obj = data as object;
-            var properties = GetPropertyInfos(obj).Where(x => !x.Updated/*添加时 更新字段 删除*/ && (!x.NullIgnore || (x.NullIgnore && !x.IsDefaultValue(data))))
-                                                  .Select(x => x.Name);
-
-            var adapter = GetFormatter(connection);
-            var columns = string.Join(",", properties.Select(x => adapter.AppendColumnName(x)));
-            //var values = string.Join(",", properties.Select(p => adapter.AppendColumnNameEqualsValue(p)));
-            var values = string.Join(",", properties.Select(p => string.Format("@{0}", p)));
-            var sql = string.Format("INSERT INTO {0} ({1}) VALUES ({2}){3}",
-                                        adapter.AppendColumnName(table),
-                                        columns, values,
-                                        adapter.InsertRowIdSql());
+            var sql = GetInsertSql(connection, table, obj);
 
             return connection.ExecuteScalar<TResult>(sql, obj, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// Insert List data into table.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="dataList"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static int InsertList<TItem>(this IDbConnection connection, IList<TItem> dataList, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            if (dataList.IsEmpty())
+                return 0;
+
+            var data = dataList.FirstOrDefault();
+            var sql = GetInsertSql(connection, table, data, false);
+
+            return connection.Execute(sql, dataList, transaction, commandTimeout);
         }
 
         /// <summary>
@@ -161,18 +184,54 @@ namespace Dapper
             IDbTransaction transaction = null, int? commandTimeout = null)
         {
             var obj = data as object;
-            var properties = GetPropertyInfos(obj).Where(x => !x.Updated/*添加时 更新字段 删除*/ && (!x.NullIgnore || (x.NullIgnore && !x.IsDefaultValue(data))))
+            var sql = GetInsertSql(connection, table, obj);
+
+            return connection.ExecuteScalarAsync<TResult>(sql, obj, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// Insert List data async into table.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="dataList"></param>
+        /// <param name="table"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static Task<int> InsertListAsync<TItem>(this IDbConnection connection, IList<TItem> dataList, string table,
+            IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            if (dataList.IsEmpty())
+                return Task.FromResult(0);
+
+            var data = dataList.FirstOrDefault();
+            var sql = GetInsertSql(connection, table, data, false);
+
+            return connection.ExecuteAsync(sql, dataList, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// Get Insert SQL
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="table"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private static string GetInsertSql<TEntity>(IDbConnection connection, string table, TEntity obj, bool appendRowId = true)
+        {
+            var properties = GetPropertyInfos(obj).Where(x => !x.Updated/*添加时 更新字段 删除*/ && !x.Ignore
+                                                                && (!x.NullIgnore || (x.NullIgnore && !x.IsDefaultValue(obj))))
                                                   .Select(x => x.Name);
 
             var adapter = GetFormatter(connection);
             var columns = string.Join(",", properties.Select(x => adapter.AppendColumnName(x)));
-            var values = string.Join(",", properties.Select(p => adapter.AppendColumnNameEqualsValue(p)));
+            var values = string.Join(",", properties.Select(p => adapter.AppendColumnNameValue(p)));
             var sql = string.Format("INSERT INTO {0} ({1}) VALUES ({2}){3}",
                                         adapter.AppendColumnName(table),
                                         columns, values,
-                                        adapter.InsertRowIdSql());
-
-            return connection.ExecuteScalarAsync<TResult>(sql, obj, transaction, commandTimeout);
+                                        appendRowId ? adapter.InsertRowIdSql() : null);
+            return sql;
         }
 
         #endregion
@@ -192,33 +251,8 @@ namespace Dapper
         public static int Update(this IDbConnection connection, dynamic data, dynamic condition, string table,
             IDbTransaction transaction = null, int? commandTimeout = null)
         {
-            var obj = data as object;
-            var conditionObj = condition as object;
-
-            var updatePropertyInfos = GetPropertyInfos(obj).Where(x => !x.Created/*更新时 添加字段 删除*/ && !x.Key);
-            var wherePropertyInfos = GetPropertyInfos(conditionObj);
-
-            var adapter = GetFormatter(connection);
-            var updateProperties = updatePropertyInfos.Select(p => p.Name);
-            var whereProperties = wherePropertyInfos.Select(p => p.Name);
-
-            var updateFields = string.Join(",", updateProperties.Select(p => adapter.AppendColumnNameEqualsValue(p)));
-            var whereFields = string.Empty;
-
-            var sqlSb = new StringBuilder();
-            sqlSb.AppendFormat("UPDATE {0} SET {1}", adapter.AppendColumnName(table), updateFields);
-            if (whereProperties.Any())
-            {
-                sqlSb.AppendFormat(" WHERE {0}", string.Join(" AND ",
-                    whereProperties.Select(p => string.Format("{0} = @w_{1}", adapter.AppendColumnName(p), p))));
-            }
-
-            var parameters = new DynamicParameters(data);
-            var expandoObject = new ExpandoObject() as IDictionary<string, object>;
-            wherePropertyInfos.ForEach(p => expandoObject.Add(string.Format("w_{0}", p.Name), p.GetValue(conditionObj)));
-            parameters.AddDynamicParams(expandoObject);
-
-            return connection.Execute(sqlSb.ToString(), parameters, transaction, commandTimeout);
+            Tuple<string, DynamicParameters> sqlParameters = GetUpdateSqlParameters(connection, data, condition, table);
+            return connection.Execute(sqlParameters.Item1, sqlParameters.Item2, transaction, commandTimeout);
         }
 
         /// <summary>
@@ -234,10 +268,24 @@ namespace Dapper
         public static Task<int> UpdateAsync(this IDbConnection connection, dynamic data, dynamic condition, string table,
             IDbTransaction transaction = null, int? commandTimeout = null)
         {
+            Tuple<string, DynamicParameters> sqlParameters = GetUpdateSqlParameters(connection, data, condition, table);
+            return connection.ExecuteAsync(sqlParameters.Item1, sqlParameters.Item2, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// Get Update SQL+Parameters
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="data"></param>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <returns></returns>
+        private static Tuple<string, DynamicParameters> GetUpdateSqlParameters(IDbConnection connection, dynamic data, dynamic condition, string table)
+        {
             var obj = data as object;
             var conditionObj = condition as object;
 
-            var updatePropertyInfos = GetPropertyInfos(obj).Where(x => !x.Created/*更新时 添加字段 删除*/ && !x.Key);
+            var updatePropertyInfos = GetPropertyInfos(obj).Where(x => !x.Created/*更新时 添加字段 删除*/ && !x.Ignore && !x.Key);
             var wherePropertyInfos = GetPropertyInfos(conditionObj);
 
             var adapter = GetFormatter(connection);
@@ -260,7 +308,7 @@ namespace Dapper
             wherePropertyInfos.ForEach(p => expandoObject.Add(string.Format("w_{0}", p.Name), p.GetValue(conditionObj)));
             parameters.AddDynamicParams(expandoObject);
 
-            return connection.ExecuteAsync(sqlSb.ToString(), parameters, transaction, commandTimeout);
+            return Tuple.Create(sqlSb.ToString(), parameters);
         }
 
         #endregion
@@ -281,12 +329,12 @@ namespace Dapper
         {
             var conditionObj = condition as object;
             var whereFields = string.Empty;
-            var whereProperties = GetProperties(conditionObj);
+            var whereProperties = GetPropertyNames(conditionObj);
             var adapter = GetFormatter(connection);
 
             var sqlSb = new StringBuilder();
             sqlSb.AppendFormat("DELETE FROM {0}", adapter.AppendColumnName(table));
-            if (whereProperties.Count > 0)
+            if (whereProperties.Any())
             {
                 sqlSb.AppendFormat(" WHERE {0}", string.Join(" AND ",
                     whereProperties.Select(p => adapter.AppendColumnNameEqualsValue(p))));
@@ -309,12 +357,12 @@ namespace Dapper
         {
             var conditionObj = condition as object;
             var whereFields = string.Empty;
-            var whereProperties = GetProperties(conditionObj);
+            var whereProperties = GetPropertyNames(conditionObj);
             var adapter = GetFormatter(connection);
 
             var sqlSb = new StringBuilder();
             sqlSb.AppendFormat("DELETE FROM {0}", adapter.AppendColumnName(table));
-            if (whereProperties.Count > 0)
+            if (whereProperties.Any())
             {
                 sqlSb.AppendFormat(" WHERE {0}", string.Join(" AND ",
                     whereProperties.Select(p => adapter.AppendColumnNameEqualsValue(p))));
@@ -572,17 +620,17 @@ namespace Dapper
         /// <returns></returns>
         public static IEnumerable<T> QueryPaged<T>(this IDbConnection connection, dynamic condition, string table,
             string orderBy, int pageIndex, int pageSize, string columns = "*", bool isOr = false,
-             IDbTransaction transaction = null, int? commandTimeout = null)
+            IDbTransaction transaction = null, int? commandTimeout = null)
         {
             if (pageIndex <= 0)
                 pageIndex = 1;
 
             var conditionObj = condition as object;
             var whereFields = string.Empty;
-            var properties = GetProperties(conditionObj);
+            var properties = GetPropertyNames(conditionObj);
 
             var adapter = GetFormatter(connection);
-            if (properties.Count > 0)
+            if (properties.Any())
             {
                 var separator = isOr ? " OR " : " AND ";
                 whereFields = " WHERE " + string.Join(separator, properties.Select(p => adapter.AppendColumnNameEqualsValue(p)));
@@ -593,14 +641,49 @@ namespace Dapper
         }
 
         /// <summary>
+        /// Query paged data async from a single table.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="condition"></param>
+        /// <param name="table"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="columns"></param>
+        /// <param name="isOr"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static Task<IEnumerable<T>> QueryPagedAsync<T>(this IDbConnection connection, dynamic condition, string table,
+            string orderBy, int pageIndex, int pageSize, string columns = "*", bool isOr = false,
+            IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var conditionObj = condition as object;
+            var whereFields = string.Empty;
+            var properties = GetPropertyNames(conditionObj);
+
+            var adapter = GetFormatter(connection);
+            var sqlSb = new StringBuilder();
+            if (properties.Any())
+            {
+                var separator = isOr ? " OR " : " AND ";
+                whereFields = " WHERE " + string.Join(separator, properties.Select(p => adapter.AppendColumnNameEqualsValue(p)));
+            }
+
+            var sql = adapter.PagedSql(adapter.AppendColumnName(table), orderBy, pageIndex, pageSize, whereFields, columns);
+            return connection.QueryAsync<T>(sql, conditionObj, transaction, commandTimeout);
+        }
+
+        /// <summary>
         /// Query paged data from a single table.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
         /// <param name="whereSql"></param>
         /// <param name="param"></param>
-        /// <param name="table"></param>
-        /// <param name="orderBy"></param>
+        /// <param name="table">table</param>
+        /// <param name="orderBy">field desc/asc</param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <param name="columns"></param>
@@ -617,32 +700,6 @@ namespace Dapper
             var adapter = GetFormatter(connection);
             var sql = adapter.PagedSql(adapter.AppendColumnName(table), orderBy,
                                         pageIndex, pageSize, whereSql, columns);
-            return connection.Query<T>(sql, param, transaction, true, commandTimeout);
-        }
-
-        /// <summary>
-        /// Query paged data from a single table.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="whereSql"></param>
-        /// <param name="param"></param>
-        /// <param name="querySql"></param>
-        /// <param name="orderBy"></param>
-        /// <param name="pageIndex"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <returns></returns>
-        public static IEnumerable<T> QueryPagedBySql<T>(this IDbConnection connection, string whereSql, object param,
-            string querySql, string orderBy, int pageIndex, int pageSize,
-             IDbTransaction transaction = null, int? commandTimeout = null)
-        {
-            if (pageIndex <= 0)
-                pageIndex = 1;
-
-            var adapter = GetFormatter(connection);
-            var sql = adapter.PagedSql(querySql, orderBy, pageIndex, pageSize, whereSql, "*");
             return connection.Query<T>(sql, param, transaction, true, commandTimeout);
         }
 
@@ -675,36 +732,55 @@ namespace Dapper
         }
 
         /// <summary>
-        /// Query paged data async from a single table.
+        /// Query paged data from querySql/whereSql.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="connection"></param>
-        /// <param name="condition"></param>
-        /// <param name="table"></param>
-        /// <param name="orderBy"></param>
+        /// <param name="whereSql">whereSql 部分</param>
+        /// <param name="param"></param>
+        /// <param name="querySql">querySql 部分, 不要包含 whereSql</param>
+        /// <param name="orderBy">field desc/asc</param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
-        /// <param name="columns"></param>
-        /// <param name="isOr"></param>
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static Task<IEnumerable<T>> QueryPagedAsync<T>(this IDbConnection connection, dynamic condition, string table, string orderBy, int pageIndex, int pageSize, string columns = "*", bool isOr = false, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static IEnumerable<T> QueryPagedBySql<T>(this IDbConnection connection, string whereSql, object param,
+            string querySql, string orderBy, int pageIndex, int pageSize,
+             IDbTransaction transaction = null, int? commandTimeout = null)
         {
-            var conditionObj = condition as object;
-            var whereFields = string.Empty;
-            var properties = GetProperties(conditionObj);
+            if (pageIndex <= 0)
+                pageIndex = 1;
 
             var adapter = GetFormatter(connection);
-            var sqlSb = new StringBuilder();
-            if (properties.Count > 0)
-            {
-                var separator = isOr ? " OR " : " AND ";
-                whereFields = " WHERE " + string.Join(separator, properties.Select(p => adapter.AppendColumnNameEqualsValue(p)));
-            }
+            var sql = adapter.PagedSql(querySql, orderBy, pageIndex, pageSize, whereSql, "*");
+            return connection.Query<T>(sql, param, transaction, true, commandTimeout);
+        }
 
-            var sql = adapter.PagedSql(adapter.AppendColumnName(table), orderBy, pageIndex, pageSize, whereFields, columns);
-            return connection.QueryAsync<T>(sql, conditionObj, transaction, commandTimeout);
+        /// <summary>
+        /// Query paged data from querySql/whereSql.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereSql"></param>
+        /// <param name="param"></param>
+        /// <param name="querySql"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static Task<IEnumerable<T>> QueryPagedBySqlAsync<T>(this IDbConnection connection, string whereSql, object param,
+            string querySql, string orderBy, int pageIndex, int pageSize,
+             IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            if (pageIndex <= 0)
+                pageIndex = 1;
+
+            var adapter = GetFormatter(connection);
+            var sql = adapter.PagedSql(querySql, orderBy, pageIndex, pageSize, whereSql, "*");
+            return connection.QueryAsync<T>(sql, param, transaction, commandTimeout);
         }
 
         #endregion
@@ -726,12 +802,12 @@ namespace Dapper
             bool isOr = false)
         {
             var conditionObj = condition as object;
-            var properties = GetProperties(conditionObj);
+            var properties = GetPropertyNames(conditionObj);
 
             var adapter = GetFormatter(connection);
             var sqlSb = new StringBuilder();
             sqlSb.AppendFormat("SELECT {1} FROM {0}", adapter.AppendColumnName(table), selectPart);
-            if (properties.Count > 0)
+            if (properties.Any())
             {
                 var separator = isOr ? " OR " : " AND ";
                 sqlSb.AppendFormat(" WHERE ")
@@ -744,12 +820,12 @@ namespace Dapper
         ///
         /// </summary>
         /// <param name="connection"></param>
-        /// <param name="param"></param>
+        /// <param name="params"></param>
         /// <param name="table"></param>
         /// <param name="selectPart"></param>
         /// <returns></returns>
         private static string BuildQuerySQL(IDbConnection connection,
-            string whereSql, object param, string table,
+            string whereSql, object @params, string table,
             string selectPart = "*")
         {
             var adapter = GetFormatter(connection);
@@ -763,11 +839,11 @@ namespace Dapper
         #region PropertyInfo
 
         /// <summary>
-        ///
+        /// GetProperties Name
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        private static List<string> GetProperties(object obj)
+        private static List<string> GetPropertyNames(object obj)
         {
             if (obj == null)
             {
@@ -792,7 +868,7 @@ namespace Dapper
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        private static List<PropertyInfoWrapper> GetPropertyInfos(object obj)
+        internal static IList<PropertyInfoWrapper> GetPropertyInfos(object obj)
         {
             if (obj == null)
             {
@@ -800,7 +876,9 @@ namespace Dapper
             }
             else if (obj is IEnumerable<KeyValuePair<string, object>>)
             {
-                return (obj as IEnumerable<KeyValuePair<string, object>>).Select(x => new PropertyInfoWrapper(x.Key, x.Value)).ToList();
+                return (obj as IEnumerable<KeyValuePair<string, object>>)
+                        .Select(x => new PropertyInfoWrapper(x.Key, x.Value))
+                        .ToList();
             }
             else if (obj is DynamicParameters)
             {
@@ -818,7 +896,7 @@ namespace Dapper
         ///
         /// </summary>
         /// <returns></returns>
-        private static List<PropertyInfoWrapper> GetPropertyInfos<TType>()
+        internal static IList<PropertyInfoWrapper> GetPropertyInfos<TType>()
         {
             return GetPropertyInfos(typeof(TType));
         }
@@ -827,33 +905,53 @@ namespace Dapper
         ///
         /// </summary>
         /// <returns></returns>
-        private static List<PropertyInfoWrapper> GetPropertyInfos(Type objType)
+        internal static IList<PropertyInfoWrapper> GetPropertyInfos(Type objType)
         {
-            List<PropertyInfoWrapper> properties = null;
-            if (_paramCache.TryGetValue(objType, out properties))
-                return properties.ToList();
+            ThrowHelper.ThrowIfNull(objType, "objType");
 
-            properties = objType.GetProperties(BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public)
-                                      .Select(x => new PropertyInfoWrapper(x.Name, x))
-                                      .ToList();
-            _paramCache[objType] = properties;
-            return properties;
+            return _paramCache.GetOrAdd(objType, _ =>
+            {
+                return objType.GetPropertyAccessors()
+                              .Select(x => new PropertyInfoWrapper(x.Name, x))
+                              .ToList();
+            });
         }
 
         /// <summary>
         /// PropertyInfo Wrapper
         /// </summary>
-        private class PropertyInfoWrapper
+        internal class PropertyInfoWrapper
         {
             /// <summary>
             /// 关联 PropertyInfo 信息
             /// </summary>
-            private PropertyInfo m_InternalPropertyInfo = null;
+            private PropertyAccessor m_InternalPropertyInfo = null;
 
             /// <summary>
-            /// 忽略本字段, 影响 Insert/Update
+            /// Value PropertyType
+            /// </summary>
+            public Type PropertyType
+            {
+                get { return m_InternalPropertyInfo.PropertyType; }
+            }
+
+            /// <summary>
+            /// Value Property
+            /// </summary>
+            public PropertyInfo Property
+            {
+                get { return m_InternalPropertyInfo.Property; }
+            }
+
+            /// <summary>
+            /// NULL 值忽略本字段, 影响 Insert/Update
             /// </summary>
             public bool NullIgnore { get; private set; }
+
+            /// <summary>
+            /// 直接忽略本字段, 影响 Insert/Update
+            /// </summary>
+            public bool Ignore { get; private set; }
 
             /// <summary>
             /// Key 字段, 影响 Insert/Update
@@ -894,27 +992,30 @@ namespace Dapper
             {
                 this.Name = name;
 
-                if (value is PropertyInfo)
+                if (value is PropertyAccessor prop && prop != null)
                 {
-                    this.m_InternalPropertyInfo = value as PropertyInfo;
-                    if (this.m_InternalPropertyInfo != null)
+                    this.m_InternalPropertyInfo = prop;
+
+                    var propertyInfo = prop.Property;
+                    var dkeyAttr = propertyInfo.GetCustomAttributes<DKeyAttribute>().FirstOrDefault();
+                    if (dkeyAttr != null)
                     {
-                        var dkeyAttr = this.m_InternalPropertyInfo.GetCustomAttributes<DKeyAttribute>().FirstOrDefault();
-                        if (dkeyAttr != null)
-                        {
-                            this.Key = true;
-                            this.NullIgnore = dkeyAttr.NullIgnore;
-                            this.DefaultValue = dkeyAttr.DefaultValue;
-                        }
-
-                        var dupdatedAttr = this.m_InternalPropertyInfo.GetCustomAttributes<DUpdatedAttribute>().FirstOrDefault();
-                        if (dupdatedAttr != null)
-                            this.Updated = true;
-
-                        var dcreatedAttr = this.m_InternalPropertyInfo.GetCustomAttributes<DCreatedAttribute>().FirstOrDefault();
-                        if (dcreatedAttr != null)
-                            this.Created = true;
+                        this.Key = true;
+                        this.NullIgnore = dkeyAttr.NullIgnore;
+                        this.DefaultValue = dkeyAttr.DefaultValue;
                     }
+
+                    var dIgnoreAttr = propertyInfo.GetCustomAttributes<DIgnoreAttribute>().FirstOrDefault();
+                    if (dIgnoreAttr != null)
+                        this.Ignore = true;
+
+                    var dupdatedAttr = propertyInfo.GetCustomAttributes<DUpdatedAttribute>().FirstOrDefault();
+                    if (dupdatedAttr != null)
+                        this.Updated = true;
+
+                    var dcreatedAttr = propertyInfo.GetCustomAttributes<DCreatedAttribute>().FirstOrDefault();
+                    if (dcreatedAttr != null)
+                        this.Created = true;
                 }
                 else
                     this.Value = value;
@@ -930,8 +1031,8 @@ namespace Dapper
             {
                 if (m_InternalPropertyInfo == null)
                     return this.Value;
-                else
-                    return m_InternalPropertyInfo.GetValue(instanceObj, n);
+
+                return m_InternalPropertyInfo.GetValue(instanceObj, n);
             }
 
             /// <summary>
@@ -941,7 +1042,7 @@ namespace Dapper
             public bool IsDefaultValue(object instanceObj)
             {
                 var currentValue = GetValue(instanceObj);
-                return currentValue.Equals(this.DefaultValue);
+                return Equals(currentValue, this.DefaultValue);
             }
         }
 
@@ -1011,6 +1112,7 @@ namespace Dapper
             = new Dictionary<string, ISqlAdapter>
             {
                 ["sqlconnection"] = new SqlServerAdapter(),
+                ["oracleconnection"] = new OracleAdapter(),
                 ["sqliteconnection"] = new SQLiteAdapter(),
                 ["mysqlconnection"] = new MySqlAdapter(),
             };
@@ -1048,8 +1150,8 @@ namespace Dapper
             /// <summary>
             /// Paged Sql
             /// </summary>
-            /// <param name="table"></param>
-            /// <param name="orderBy"></param>
+            /// <param name="table">table/sql</param>
+            /// <param name="orderBy">field desc/asc</param>
             /// <param name="pageIndex"></param>
             /// <param name="pageSize"></param>
             /// <param name="whereFields"></param>
@@ -1085,13 +1187,13 @@ namespace Dapper
         /// <summary>
         /// The SQL Server database adapter.
         /// </summary>
-        public partial class SqlServerAdapter : ISqlAdapter
+        public class SqlServerAdapter : ISqlAdapter
         {
             /// <summary>
-            /// PagedSql
+            /// Paged Sql
             /// </summary>
-            /// <param name="table"></param>
-            /// <param name="orderBy"></param>
+            /// <param name="table">table/sql</param>
+            /// <param name="orderBy">field desc/asc</param>
             /// <param name="pageIndex"></param>
             /// <param name="pageSize"></param>
             /// <param name="whereFields"></param>
@@ -1141,9 +1243,72 @@ namespace Dapper
         }
 
         /// <summary>
+        /// The Oracle database adapter.
+        /// </summary>
+        public class OracleAdapter : ISqlAdapter
+        {
+            /// <summary>
+            /// Paged Sql
+            /// </summary>
+            /// <param name="table">table/sql</param>
+            /// <param name="orderBy">field desc/asc</param>
+            /// <param name="pageIndex"></param>
+            /// <param name="pageSize"></param>
+            /// <param name="whereFields"></param>
+            /// <param name="columns"></param>
+            /// <returns></returns>
+            public string PagedSql(string table, string orderBy, int pageIndex, int pageSize, string whereFields, string columns = "*")
+            {
+                int startNum = (pageIndex - 1) * pageSize;
+                int endNum = startNum + pageSize + 1;
+
+                return string.Format("SELECT {0} FROM (SELECT T.*, rownum rn FROM ({2} {3} ORDER BY {1}) t WHERE rownum<{5}) WHERE rn>{4}",
+                                 columns, orderBy, table, whereFields,
+                                 startNum, endNum);
+            }
+
+            /// <summary>
+            /// LAST_INSERT_ID
+            /// </summary>
+            /// <returns></returns>
+            public string InsertRowIdSql()
+            {
+                return string.Empty;
+                //throw new NotImplementedException("InsertRowIdSql");
+            }
+
+            /// <summary>
+            /// Adds the name of a column.
+            /// </summary>
+            /// <param name="columnName">The column name.</param>
+            public string AppendColumnName(string columnName)
+            {
+                return string.Format("{0}", columnName);
+            }
+
+            /// <summary>
+            /// Adds a column equality to a parameter.
+            /// </summary>
+            /// <param name="columnName">The column name.</param>
+            public string AppendColumnNameEqualsValue(string columnName)
+            {
+                return string.Format("{0} = :{1}", columnName, columnName);
+            }
+
+            /// <summary>
+            /// Adds the name of a parameter.
+            /// </summary>
+            /// <param name="columnName">The column name.</param>
+            public string AppendColumnNameValue(string columnName)
+            {
+                return string.Format(":{0}", columnName);
+            }
+        }
+
+        /// <summary>
         /// The MySQL database adapter.
         /// </summary>
-        public partial class MySqlAdapter : ISqlAdapter
+        public class MySqlAdapter : ISqlAdapter
         {
             /// <summary>
             /// PagedSql
@@ -1157,7 +1322,7 @@ namespace Dapper
             /// <returns></returns>
             public string PagedSql(string table, string orderBy, int pageIndex, int pageSize, string whereFields, string columns = "*")
             {
-                return string.Format("SELECT {0} FROM ({2}) {3} ORDER BY {1} LIMIT {4}, {5}",
+                return string.Format("SELECT {0} FROM ({2}) t {3} ORDER BY {1} LIMIT {4}, {5}",
                                  columns, orderBy, table, whereFields,
                                  (pageIndex - 1) * pageSize, pageSize);
             }
@@ -1202,13 +1367,13 @@ namespace Dapper
         /// <summary>
         /// The SQLite database adapter.
         /// </summary>
-        public partial class SQLiteAdapter : ISqlAdapter
+        public class SQLiteAdapter : ISqlAdapter
         {
             /// <summary>
-            /// PagedSql
+            /// Paged Sql
             /// </summary>
-            /// <param name="table"></param>
-            /// <param name="orderBy"></param>
+            /// <param name="table">table/sql</param>
+            /// <param name="orderBy">field desc/asc</param>
             /// <param name="pageIndex"></param>
             /// <param name="pageSize"></param>
             /// <param name="whereFields"></param>

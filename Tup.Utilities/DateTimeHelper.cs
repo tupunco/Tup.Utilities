@@ -14,6 +14,46 @@ namespace Tup.Utilities
         /// </summary>
         private static readonly DateTime LocalDateTime19700101 = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
 
+        #region ToLocalTime2
+
+        /// <summary>
+        /// 如果 <paramref name="unspecifiedDate"/> 为 <see cref="DateTimeKind.Unspecified"/> ,
+        /// 使用 <see cref="DateTime.SpecifyKind(DateTime, DateTimeKind)"/> 将当前 System.DateTime 对象的值转换为本地时间。
+        /// </summary>
+        /// <param name="unspecifiedDate"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// <see cref="DateTime.SpecifyKind(DateTime, DateTimeKind)"/>
+        /// <see cref="DateTimeKind.Unspecified"/>
+        /// </remarks>
+        public static DateTime ToLocalTime2(this DateTime unspecifiedDate)
+        {
+            if (unspecifiedDate.Kind == DateTimeKind.Unspecified)
+                return DateTime.SpecifyKind(unspecifiedDate, DateTimeKind.Local);
+
+            return unspecifiedDate;
+        }
+
+        /// <summary>
+        /// 如果 <paramref name="unspecifiedDate"/> 为 <see cref="DateTimeKind.Unspecified"/> ,
+        /// 使用 <see cref="DateTime.SpecifyKind(DateTime, DateTimeKind)"/> 将当前 System.DateTime 对象的值转换为本地时间。
+        /// </summary>
+        /// <param name="unspecifiedDate"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// <see cref="DateTime.SpecifyKind(DateTime, DateTimeKind)"/>
+        /// <see cref="DateTimeKind.Unspecified"/>
+        /// </remarks>
+        public static DateTime? ToLocalTime2(this DateTime? unspecifiedDate)
+        {
+            if (unspecifiedDate.HasValue)
+                return ToLocalTime2(unspecifiedDate.Value);
+
+            return unspecifiedDate;
+        }
+
+        #endregion
+
         #region Javascript 毫秒时间戳
 
         /// <summary>
@@ -90,6 +130,7 @@ namespace Tup.Utilities
         #endregion
 
         #region 整天/下一天
+
         /// <summary>
         /// 整天
         /// </summary>
@@ -102,6 +143,7 @@ namespace Tup.Utilities
         {
             return date.Date.AddDays(1).AddTicks(-1);
         }
+
         /// <summary>
         /// 明天零点
         /// </summary>
@@ -111,6 +153,7 @@ namespace Tup.Utilities
         {
             return date.Date.AddDays(1);
         }
+
         #endregion
     }
 }

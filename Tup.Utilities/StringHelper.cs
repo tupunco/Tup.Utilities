@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 
 namespace Tup.Utilities
@@ -128,6 +127,7 @@ namespace Tup.Utilities
         #endregion ToArrayEx
 
         #region ParseTo
+
         /// <summary>
         ///     解析当前字符串到 Boolean 值
         /// </summary>
@@ -252,7 +252,82 @@ namespace Tup.Utilities
 
         #endregion ParseTo
 
-        #region Trim/Empty/Fmt
+        #region Trim/Empty/Fmt/Substring/Split/Join
+
+        /// <summary>
+        /// 从此实例检索子字符串。 子字符串从指定的字符位置开始且具有指定的长度。
+        /// 超出可以添加 `省略号`
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="length">子字符串中的字符数。</param>
+        /// <param name="ellipsis">超出省略号</param>
+        /// <returns>
+        /// 与此实例中在 length 处开头、长度为 startIndex 的子字符串等效的一个字符串；如果 System.String.Empty 等于此实例的长度且
+        /// startIndex 为零，则为 length。
+        /// </returns>
+        public static string Substring2(this string input, int length, string ellipsis = null)
+        {
+            if (input.IsEmpty())
+                return string.Empty;
+
+            if (input.Length <= length)
+                return input;
+
+            var values = input.Substring(0, length);
+            return ellipsis.HasValue() ? (values + ellipsis) : values;
+        }
+
+        /// <summary>
+        /// Returns a string array that contains the substrings in this string that are delimited
+        ///     by elements of a specified string array. A parameter specifies whether to return
+        ///     empty array elements.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static string[] Split2(this string input,
+            params char[] separator)
+        {
+            if (input.IsEmpty())
+                return new string[0];
+
+            return input.Split(separator);
+        }
+
+        /// <summary>
+        /// Returns a string array that contains the substrings in this string that are delimited
+        ///     by elements of a specified string array. A parameter specifies whether to return
+        ///     empty array elements.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="separator"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static string[] Split2(this string input,
+            char[] separator,
+            StringSplitOptions options = StringSplitOptions.None)
+        {
+            if (input.IsEmpty())
+                return new string[0];
+
+            return input.Split(separator, options);
+        }
+
+        /// <summary>
+        ///  Concatenates the members of a collection, using the specified separator between
+        //     each member.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="values"></param>
+        /// <param name="separator"></param>
+        /// <returns></returns>
+        public static string Join2<T>(this IEnumerable<T> values, string separator)
+        {
+            if (values.IsEmpty())
+                return string.Empty;
+
+            return string.Join<T>(separator, values);
+        }
 
         /// <summary>
         ///     从当前 System.String 对象移除所有前导空白字符和尾部空白字符。
@@ -364,6 +439,78 @@ namespace Tup.Utilities
                 base64String = base64String.FixBase64UrlString();
 
             return encoding.GetString(Convert.FromBase64String(base64String));
+        }
+
+        #endregion
+
+        #region HexToBinary/BinaryToHex
+
+        private static int HexToInt(char h)
+        {
+            if (h < '0' || h > '9')
+            {
+                if (h < 'a' || h > 'f')
+                {
+                    if (h < 'A' || h > 'F')
+                    {
+                        return -1;
+                    }
+                    return h - 65 + 10;
+                }
+                return h - 97 + 10;
+            }
+            return h - 48;
+        }
+
+        private static char NibbleToHex(byte nibble)
+        {
+            return (char)((nibble < 10) ? (nibble + 48) : (nibble - 10 + 65));
+        }
+
+        /// <summary>
+        /// `十六进制串` 转 `字节`/Hex To Binary
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static byte[] HexToBinary(this string data)
+        {
+            if (data == null || data.Length % 2 != 0)
+            {
+                return null;
+            }
+
+            byte[] array = new byte[data.Length / 2];
+            for (int i = 0; i < array.Length; i++)
+            {
+                int num = HexToInt(data[2 * i]);
+                int num2 = HexToInt(data[2 * i + 1]);
+                if (num == -1 || num2 == -1)
+                {
+                    return null;
+                }
+                array[i] = (byte)((num << 4) | num2);
+            }
+            return array;
+        }
+
+        /// <summary>
+        /// `字节` 转 `十六进制串`/Binary to Hex
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string BinaryToHex(this byte[] data)
+        {
+            if (data == null)
+                return null;
+
+            char[] array = new char[checked(data.Length * 2)];
+            for (int i = 0; i < data.Length; i++)
+            {
+                byte b = data[i];
+                array[2 * i] = NibbleToHex((byte)(b >> 4));
+                array[2 * i + 1] = NibbleToHex((byte)(b & 0xF));
+            }
+            return new string(array);
         }
 
         #endregion

@@ -86,11 +86,14 @@ namespace Tup.Utilities.DbWrapper
         }
 
 #if NET_45
+
         public override Task OpenAsync(CancellationToken cancellationToken)
         {
             return this.m_DbConnection.OpenAsync(cancellationToken);
         }
+
 #endif
+
         protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
         {
             return new DbTransactionWrapper(this.m_DbConnection.BeginTransaction(isolationLevel), this);

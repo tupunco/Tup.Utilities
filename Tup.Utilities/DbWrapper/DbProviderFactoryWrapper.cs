@@ -16,7 +16,7 @@ namespace Tup.Utilities.DbWrapper
 
         public void Dispose()
         {
-           if (m_FactoryInstance is IDisposable)
+            if (m_FactoryInstance is IDisposable)
                 (m_FactoryInstance as IDisposable).Dispose();
         }
 

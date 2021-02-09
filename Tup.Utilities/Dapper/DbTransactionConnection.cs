@@ -7,8 +7,16 @@ namespace System.Data
     /// </summary>
     public class DbTransactionConnection : IDbConnection
     {
-        private IDbTransaction innerDbTransaction = null;
-        private IDbConnection innerDbConnection = null;
+        private readonly IDbTransaction innerDbTransaction = null;
+        private readonly IDbConnection innerDbConnection;
+
+        /// <summary>
+        /// InnerDbConnection
+        /// </summary>
+        public IDbConnection InnerDbConnection
+        {
+            get { return innerDbConnection; }
+        }
 
         public DbTransactionConnection(IDbTransaction dbTransaction)
         {
