@@ -90,6 +90,12 @@ namespace Tup.Utilities
             /// </summary>
             public string Name { get; protected set; }
 
+            public override string ToString()
+            {
+                return string.Format("[Name:{0}-PropertyType:{1}]",
+                    this.Name, this.PropertyType.Name);
+            }
+
             /// <summary>
             /// Gets the property value getter.
             /// </summary>

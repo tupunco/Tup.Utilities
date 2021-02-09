@@ -9,7 +9,7 @@ namespace Tup.Utilities
     /// <remarks>
     ///     原始代码FROM:   MoreLINQ - Extensions to LINQ to Objects
     /// </remarks>
-    internal static class ThrowHelper
+    public static class ThrowHelper
     {
         /// <summary>
         ///     对象 null   判断

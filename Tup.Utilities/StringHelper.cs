@@ -7,7 +7,7 @@ namespace Tup.Utilities
     /// <summary>
     ///     String Helper
     /// </summary>
-    internal static class StringHelper
+    public static class StringHelper
     {
         #region ToArrayEx
 
@@ -376,7 +376,7 @@ namespace Tup.Utilities
             return string.Format(format, args);
         }
 
-        #endregion Trim/Empty/Fmt
+        #endregion
 
         #region Base64
 

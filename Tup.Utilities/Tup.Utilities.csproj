@@ -79,6 +79,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncHelper.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\ActivatorUtilities\ActivatorUtilities.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\ActivatorUtilities\ActivatorUtilitiesConstructorAttribute.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\ActivatorUtilities\ObjectFactory.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\CachedExpressionCompiler\CachedExpressionCompiler.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\ExpressionHelper.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\CachedExpressionCompiler\LambdaExpressionComparer.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\CachedExpressionCompiler\MemberExpressionCacheKey.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\CachedExpressionCompiler\MemberExpressionCacheKeyComparer.cs" />
     <Compile Include="Common\BizResult.cs" />
     <Compile Include="ConfigHelper.cs" />
     <Compile Include="Dapper\DbTransactionConnection.cs" />
@@ -89,8 +97,15 @@
     <Compile Include="Data\BaseDao.cs" />
     <Compile Include="Data\IServiceTransaction.cs" />
     <Compile Include="Data\FieldHelper.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\ParameterDefaultValue\ParameterDefaultValue.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\TypeActivatorCache.cs" />
     <Compile Include="MimeTypeMap.cs" />
     <Compile Include="Data\RetryHelper.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\ObjectMethodExecutor\AwaitableInfo.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\ObjectMethodExecutor\CoercedAwaitableInfo.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\ObjectMethodExecutor\ObjectMethodExecutor.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\ObjectMethodExecutor\ObjectMethodExecutorAwaitable.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\ObjectMethodExecutor\ObjectMethodExecutorFSharpSupport.cs" />
     <Compile Include="Reflection\ActivatorHelper.cs" />
     <Compile Include="Reflection\PropertyHelper.cs" />
     <Compile Include="Security\Base32.cs" />
@@ -98,6 +113,7 @@
     <Compile Include="Security\CryptHelper.cs" />
     <Compile Include="Security\Fnv\FnvHash.cs" />
     <Compile Include="Security\Fnv\FnvHelper.cs" />
+    <Compile Include="Microsoft.Extensions.Internal\HashCodeCombiner.cs" />
     <Compile Include="Security\Totp\Rfc6238AuthenticationService.cs" />
     <Compile Include="Security\Totp\TotpHelper.cs" />
     <Compile Include="Data\BatchHelper.cs" />

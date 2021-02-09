@@ -78,6 +78,7 @@ namespace Tup.Utilities
             BindingFlags flags = BindingFlags.Default;
             if (staticFlags) //GetProperties() 默认参数
                 flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
+
             if (bindingAttr != BindingFlags.Default)
                 flags = bindingAttr;
             else
