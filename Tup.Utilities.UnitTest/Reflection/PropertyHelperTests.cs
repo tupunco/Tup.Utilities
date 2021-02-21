@@ -24,8 +24,8 @@ namespace Tup.Utilities.Tests
             var helper = new PropertyHelper.PropertyAccessor(property);
 
             // Assert
-            Assert.AreEqual("foo", property.Name);
-            Assert.AreEqual("foo", helper.Name);
+            Assert2.Equal("foo", property.Name);
+            Assert2.Equal("foo", helper.Name);
         }
 
         [TestMethod]
@@ -39,8 +39,8 @@ namespace Tup.Utilities.Tests
             var helper = new PropertyHelper.PropertyAccessor(property);
 
             // Assert
-            Assert.AreEqual("bar", helper.Name);
-            Assert.AreEqual("baz", helper.GetValue(anonymous));
+            Assert2.Equal("bar", helper.Name);
+            Assert2.Equal("baz", helper.GetValue(anonymous));
         }
 
         [TestMethod]
@@ -54,8 +54,8 @@ namespace Tup.Utilities.Tests
             var helper = new PropertyHelper.PropertyAccessor(property);
 
             // Assert
-            Assert.IsNotNull(helper.ValueGetter);
-            Assert.AreEqual("baz", helper.ValueGetter(anonymous));
+            Assert2.NotNull(helper.ValueGetter);
+            Assert2.Equal("baz", helper.ValueGetter(anonymous));
         }
 
         [TestMethod]
@@ -71,7 +71,7 @@ namespace Tup.Utilities.Tests
             helper.SetValue(instance, expected);
 
             // Assert
-            Assert.AreEqual(expected, instance.PropA);
+            Assert2.Equal(expected, instance.PropA);
         }
 
         [TestMethod]
@@ -84,11 +84,11 @@ namespace Tup.Utilities.Tests
                 instance.GetType()).First(prop => prop.Name == "PropA");
 
             // Act and Assert
-            Assert.IsNotNull(helper.ValueSetter);
+            Assert2.NotNull(helper.ValueSetter);
             helper.ValueSetter(instance, expected);
 
             // Assert
-            Assert.AreEqual(expected, instance.PropA);
+            Assert2.Equal(expected, instance.PropA);
         }
 
         [TestMethod]
@@ -102,8 +102,8 @@ namespace Tup.Utilities.Tests
             var helper = new PropertyHelper.PropertyAccessor(property);
 
             // Assert
-            Assert.AreEqual("foo", helper.Name);
-            Assert.AreEqual(32, helper.GetValue(anonymous));
+            Assert2.Equal("foo", helper.Name);
+            Assert2.Equal(32, helper.GetValue(anonymous));
         }
 
         [TestMethod]
@@ -118,8 +118,8 @@ namespace Tup.Utilities.Tests
 
             // Assert
             Assert2.Single(helpers1);
-            Assert.AreSame(helpers1, helpers2);
-            Assert.AreSame(helpers1[0], helpers2[0]);
+            Assert2.Same(helpers1, helpers2);
+            Assert2.Same(helpers1[0], helpers2[0]);
         }
 
         [TestMethod]
@@ -130,7 +130,7 @@ namespace Tup.Utilities.Tests
 
             // Act + Assert
             var helper = Assert2.Single(PropertyHelper.GetPropertyAccessors(anonymous.GetType().GetTypeInfo()));
-            Assert.AreEqual("bar_baz2", helper.Name);
+            Assert2.Equal("bar_baz2", helper.Name);
         }
 
         [TestMethod]
@@ -141,7 +141,7 @@ namespace Tup.Utilities.Tests
 
             // Act + Assert
             var helper = Assert2.Single(PropertyHelper.GetPropertyAccessors(anonymous.GetType().GetTypeInfo()));
-            Assert.AreEqual("Prop1", helper.Name);
+            Assert2.Equal("Prop1", helper.Name);
         }
 
         [TestMethod]
@@ -152,7 +152,7 @@ namespace Tup.Utilities.Tests
 
             // Act + Assert
             var helper = Assert2.Single(PropertyHelper.GetPropertyAccessors(anonymous.GetType().GetTypeInfo()));
-            Assert.AreEqual("Prop5", helper.Name);
+            Assert2.Equal("Prop5", helper.Name);
         }
 
 #if NETSTANDARD || NETCOREAPP
@@ -164,7 +164,7 @@ namespace Tup.Utilities.Tests
 
             // Act + Assert
             var helper = Assert2.Single(PropertyHelper.GetPropertyAccessors(obj.GetType().GetTypeInfo()));
-            Assert.AreEqual("Prop5", helper.Name);
+            Assert2.Equal("Prop5", helper.Name);
         }
 #elif NET46 || NET461
 #else
@@ -179,7 +179,7 @@ namespace Tup.Utilities.Tests
 
         //    // Act + Assert
         //    var helper = Assert2.Single(PropertyHelper.GetPropertyAccessors(anonymous.GetType().GetTypeInfo()));
-        //    Assert.AreEqual("Prop6", helper.Name);
+        //    Assert2.Equal("Prop6", helper.Name);
         //}
 
         //[Theory]
@@ -210,7 +210,7 @@ namespace Tup.Utilities.Tests
 
             // Assert
             var property = Assert2.Single(properties);
-            Assert.AreEqual("Foo", property.Name);
+            Assert2.Equal("Foo", property.Name);
         }
 
         [TestMethod]
@@ -225,8 +225,8 @@ namespace Tup.Utilities.Tests
             // Act + Assert
             var helper1 = Assert2.Single(PropertyHelper.GetPropertyAccessors(anonymous.GetType().GetTypeInfo()).Where(prop => prop.Name == "IntProp"));
             var helper2 = Assert2.Single(PropertyHelper.GetPropertyAccessors(anonymous.GetType().GetTypeInfo()).Where(prop => prop.Name == "StringProp"));
-            Assert.AreEqual(3, helper1.GetValue(anonymous));
-            Assert.AreEqual("Five", helper2.GetValue(anonymous));
+            Assert2.Equal(3, helper1.GetValue(anonymous));
+            Assert2.Equal("Five", helper2.GetValue(anonymous));
         }
 
         [TestMethod]
@@ -239,14 +239,14 @@ namespace Tup.Utilities.Tests
             var helpers = PropertyHelper.GetPropertyAccessors(derived.GetType().GetTypeInfo()).ToArray();
 
             // Assert
-            Assert.IsNotNull(helpers);
-            Assert.AreEqual(2, helpers.Length);
+            Assert2.NotNull(helpers);
+            Assert2.Equal(2, helpers.Length);
 
             var propAHelper = Assert2.Single(helpers.Where(h => h.Name == "PropA"));
             var propBHelper = Assert2.Single(helpers.Where(h => h.Name == "PropB"));
 
-            Assert.AreEqual("propAValue", propAHelper.GetValue(derived));
-            Assert.AreEqual("propBValue", propBHelper.GetValue(derived));
+            Assert2.Equal("propAValue", propAHelper.GetValue(derived));
+            Assert2.Equal("propBValue", propBHelper.GetValue(derived));
         }
 
         [TestMethod]
@@ -259,14 +259,14 @@ namespace Tup.Utilities.Tests
             var helpers = PropertyHelper.GetPropertyAccessors(derived.GetType().GetTypeInfo()).ToArray();
 
             // Assert
-            Assert.IsNotNull(helpers);
-            Assert.AreEqual(2, helpers.Length);
+            Assert2.NotNull(helpers);
+            Assert2.Equal(2, helpers.Length);
 
             var propAHelper = Assert2.Single(helpers.Where(h => h.Name == "PropA"));
             var propBHelper = Assert2.Single(helpers.Where(h => h.Name == "PropB"));
 
-            Assert.AreEqual("propAValue", propAHelper.GetValue(derived));
-            Assert.AreEqual("Newed", propBHelper.GetValue(derived));
+            Assert2.Equal("propAValue", propAHelper.GetValue(derived));
+            Assert2.Equal("Newed", propBHelper.GetValue(derived));
         }
 
         [TestMethod]
@@ -279,14 +279,14 @@ namespace Tup.Utilities.Tests
             var helpers = PropertyHelper.GetPropertyAccessors(derived.GetType().GetTypeInfo()).ToArray();
 
             // Assert
-            Assert.IsNotNull(helpers);
-            Assert.AreEqual(2, helpers.Length);
+            Assert2.NotNull(helpers);
+            Assert2.Equal(2, helpers.Length);
 
             var propAHelper = Assert2.Single(helpers.Where(h => h.Name == "PropA"));
             var propBHelper = Assert2.Single(helpers.Where(h => h.Name == "PropB"));
 
-            Assert.AreEqual("OverridenpropAValue", propAHelper.GetValue(derived));
-            Assert.AreEqual("propBValue", propBHelper.GetValue(derived));
+            Assert2.Equal("OverridenpropAValue", propAHelper.GetValue(derived));
+            Assert2.Equal("propBValue", propBHelper.GetValue(derived));
         }
 
         //[TestMethod]
@@ -333,12 +333,12 @@ namespace Tup.Utilities.Tests
             var result = PropertyHelper.GetPropertyAccessors(type).ToArray();
 
             // Assert
-            Assert.IsNotNull(result);
+            Assert2.NotNull(result);
 
-            //Assert.AreEqual(3, result.Length);
-            //Assert.AreEqual("Visible", result[0].Name);
-            //Assert.AreEqual("PropA", result[1].Name);
-            //Assert.AreEqual("PropB", result[2].Name);
+            //Assert2.Equal(3, result.Length);
+            //Assert2.Equal("Visible", result[0].Name);
+            //Assert2.Equal("PropA", result[1].Name);
+            //Assert2.Equal("PropB", result[2].Name);
         }
 
         //[TestMethod]
@@ -352,8 +352,8 @@ namespace Tup.Utilities.Tests
 
         //    // Assert
         //    var property = Assert2.Single(result);
-        //    Assert.AreEqual("Length", property.Name);
-        //    Assert.AreEqual(typeof(int), property.Property.PropertyType);
+        //    Assert2.Equal("Length", property.Name);
+        //    Assert2.Equal(typeof(int), property.Property.PropertyType);
         //}
 
         //[TestMethod]
@@ -366,11 +366,11 @@ namespace Tup.Utilities.Tests
         //    var result = PropertyHelper.GetVisibleProperties(type).ToArray();
 
         //    // Assert
-        //    Assert.AreEqual(2, result.Length);
-        //    Assert.AreEqual("Id", result[0].Name);
-        //    Assert.AreEqual(typeof(string), result[0].Property.PropertyType);
-        //    Assert.AreEqual("Name", result[1].Name);
-        //    Assert.AreEqual(typeof(string), result[1].Property.PropertyType);
+        //    Assert2.Equal(2, result.Length);
+        //    Assert2.Equal("Id", result[0].Name);
+        //    Assert2.Equal(typeof(string), result[0].Property.PropertyType);
+        //    Assert2.Equal("Name", result[1].Name);
+        //    Assert2.Equal(typeof(string), result[1].Property.PropertyType);
         //}
 
         //[TestMethod]
@@ -383,11 +383,11 @@ namespace Tup.Utilities.Tests
         //    var result = PropertyHelper.GetVisibleProperties(type).ToArray();
 
         //    // Assert
-        //    Assert.AreEqual(2, result.Length);
-        //    Assert.AreEqual("Id", result[0].Name);
-        //    Assert.AreEqual(typeof(Guid), result[0].Property.PropertyType);
-        //    Assert.AreEqual("Name", result[1].Name);
-        //    Assert.AreEqual(typeof(string), result[1].Property.PropertyType);
+        //    Assert2.Equal(2, result.Length);
+        //    Assert2.Equal("Id", result[0].Name);
+        //    Assert2.Equal(typeof(Guid), result[0].Property.PropertyType);
+        //    Assert2.Equal("Name", result[1].Name);
+        //    Assert2.Equal(typeof(string), result[1].Property.PropertyType);
         //}
 
         //[TestMethod]
@@ -401,8 +401,8 @@ namespace Tup.Utilities.Tests
 
         //    // Assert
         //    var property = Assert2.Single(result);
-        //    Assert.AreEqual("Length", property.Name);
-        //    Assert.AreEqual(typeof(int), property.Property.PropertyType);
+        //    Assert2.Equal("Length", property.Name);
+        //    Assert2.Equal(typeof(int), property.Property.PropertyType);
         //}
 
         //[TestMethod]
@@ -415,11 +415,11 @@ namespace Tup.Utilities.Tests
         //    var result = PropertyHelper.GetVisibleProperties(type.GetTypeInfo()).ToArray();
 
         //    // Assert
-        //    Assert.AreEqual(2, result.Length);
-        //    Assert.AreEqual("Id", result[0].Name);
-        //    Assert.AreEqual(typeof(string), result[0].Property.PropertyType);
-        //    Assert.AreEqual("Name", result[1].Name);
-        //    Assert.AreEqual(typeof(string), result[1].Property.PropertyType);
+        //    Assert2.Equal(2, result.Length);
+        //    Assert2.Equal("Id", result[0].Name);
+        //    Assert2.Equal(typeof(string), result[0].Property.PropertyType);
+        //    Assert2.Equal("Name", result[1].Name);
+        //    Assert2.Equal(typeof(string), result[1].Property.PropertyType);
         //}
 
         //[TestMethod]
@@ -432,11 +432,11 @@ namespace Tup.Utilities.Tests
         //    var result = PropertyHelper.GetVisibleProperties(type.GetTypeInfo()).ToArray();
 
         //    // Assert
-        //    Assert.AreEqual(2, result.Length);
-        //    Assert.AreEqual("Id", result[0].Name);
-        //    Assert.AreEqual(typeof(Guid), result[0].Property.PropertyType);
-        //    Assert.AreEqual("Name", result[1].Name);
-        //    Assert.AreEqual(typeof(string), result[1].Property.PropertyType);
+        //    Assert2.Equal(2, result.Length);
+        //    Assert2.Equal("Id", result[0].Name);
+        //    Assert2.Equal(typeof(Guid), result[0].Property.PropertyType);
+        //    Assert2.Equal("Name", result[1].Name);
+        //    Assert2.Equal(typeof(string), result[1].Property.PropertyType);
         //}
 
         [TestMethod]
@@ -455,8 +455,8 @@ namespace Tup.Utilities.Tests
             protectedPropertySetter(instance, "TestProtected");
 
             // Assert
-            Assert.AreEqual("TestPublic", instance.PropA);
-            Assert.AreEqual("TestProtected", instance.GetPropProtected());
+            Assert2.Equal("TestPublic", instance.PropA);
+            Assert2.Equal("TestProtected", instance.GetPropProtected());
         }
 
         [TestMethod]
@@ -472,7 +472,7 @@ namespace Tup.Utilities.Tests
             propertySetter(instance, "Test value");
 
             // Assert
-            Assert.AreEqual("OverridenTest value", instance.PropA);
+            Assert2.Equal("OverridenTest value", instance.PropA);
         }
 
         [TestMethod]
@@ -488,7 +488,7 @@ namespace Tup.Utilities.Tests
             propertySetter(instance, "Test value");
 
             // Assert
-            Assert.AreEqual("NewedTest value", instance.PropB);
+            Assert2.Equal("NewedTest value", instance.PropB);
         }
 
         [TestMethod]
@@ -502,7 +502,7 @@ namespace Tup.Utilities.Tests
             var accessor = PropertyHelper.MakeFastPropertyGetter(property.Property);
 
             // Act & Assert
-            Assert.ThrowsException<NullReferenceException>(() => accessor(null));
+            Assert2.Throws<NullReferenceException>(() => accessor(null));
         }
 
         [TestMethod]
@@ -516,7 +516,7 @@ namespace Tup.Utilities.Tests
             var accessor = PropertyHelper.MakeFastPropertyGetter(property.Property);
 
             // Act & Assert
-            Assert.ThrowsException<NullReferenceException>(() => accessor(null));
+            Assert2.Throws<NullReferenceException>(() => accessor(null));
         }
 
         [TestMethod]
@@ -533,7 +533,7 @@ namespace Tup.Utilities.Tests
             var value = accessor(new BaseClass() { PropA = "Hi" });
 
             // Assert
-            Assert.AreEqual("Hi", value);
+            Assert2.Equal("Hi", value);
         }
 
         [TestMethod]
@@ -550,7 +550,7 @@ namespace Tup.Utilities.Tests
             var value = accessor(new MyProperties() { StringProp = "Hi" });
 
             // Assert
-            Assert.AreEqual("Hi", value);
+            Assert2.Equal("Hi", value);
         }
 
         [TestMethod]
@@ -567,7 +567,7 @@ namespace Tup.Utilities.Tests
             var value = accessor(null);
 
             // Assert
-            Assert.IsNull(value);
+            Assert2.Null(value);
         }
 
         [TestMethod]
@@ -584,7 +584,7 @@ namespace Tup.Utilities.Tests
             var value = accessor(null);
 
             // Assert
-            Assert.IsNull(value);
+            Assert2.Null(value);
         }
 
         public static TheoryData<object, KeyValuePair<string, object>> IgnoreCaseTestData
@@ -640,7 +640,7 @@ namespace Tup.Utilities.Tests
 
             // Assert
             var entry = Assert2.Single(result);
-            Assert.AreEqual(expectedEntry, entry);
+            Assert2.Equal(expectedEntry, entry);
         }
 
         [TestMethod]
@@ -653,8 +653,8 @@ namespace Tup.Utilities.Tests
             var dictValues = PropertyHelper.ObjectToDictionary(value);
 
             // Assert
-            Assert.IsNotNull(dictValues);
-            Assert.AreEqual(0, dictValues.Count);
+            Assert2.NotNull(dictValues);
+            Assert2.Equal(0, dictValues.Count);
         }
 
         [TestMethod]
@@ -667,8 +667,8 @@ namespace Tup.Utilities.Tests
             var dictValues = PropertyHelper.ObjectToDictionary(value);
 
             // Assert
-            Assert.IsNotNull(dictValues);
-            Assert.AreEqual(0, dictValues.Count);
+            Assert2.NotNull(dictValues);
+            Assert2.Equal(0, dictValues.Count);
         }
 
         //[TestMethod]
@@ -681,9 +681,9 @@ namespace Tup.Utilities.Tests
         //    var dictValues = PropertyHelper.ObjectToDictionary(value);
 
         //    // Assert
-        //    Assert.IsNotNull(dictValues);
-        //    Assert.AreEqual(1, dictValues.Count);
-        //    Assert.AreEqual(4, dictValues["Length"]);
+        //    Assert2.NotNull(dictValues);
+        //    Assert2.Equal(1, dictValues.Count);
+        //    Assert2.Equal(4, dictValues["Length"]);
         //}
 
         [TestMethod]
@@ -696,10 +696,10 @@ namespace Tup.Utilities.Tests
             var dictValues = PropertyHelper.ObjectToDictionary(value);
 
             // Assert
-            Assert.IsNotNull(dictValues);
-            Assert.AreEqual(2, dictValues.Count);
-            Assert.AreEqual("value", dictValues["test"]);
-            Assert.AreEqual(1, dictValues["other"]);
+            Assert2.NotNull(dictValues);
+            Assert2.Equal(2, dictValues.Count);
+            Assert2.Equal("value", dictValues["test"]);
+            Assert2.Equal(1, dictValues["other"]);
         }
 
         [TestMethod]
@@ -712,10 +712,10 @@ namespace Tup.Utilities.Tests
             var dictValues = PropertyHelper.ObjectToDictionary(value);
 
             // Assert
-            Assert.IsNotNull(dictValues);
-            Assert.AreEqual(2, dictValues.Count);
-            Assert.AreEqual("value", dictValues["test"]);
-            Assert.AreEqual(1, dictValues["other"]);
+            Assert2.NotNull(dictValues);
+            Assert2.Equal(2, dictValues.Count);
+            Assert2.Equal("value", dictValues["test"]);
+            Assert2.Equal(1, dictValues["other"]);
         }
 
         [TestMethod]
@@ -728,11 +728,11 @@ namespace Tup.Utilities.Tests
             var dictValues = PropertyHelper.ObjectToDictionary(value);
 
             // Assert
-            Assert.IsNotNull(dictValues);
-            Assert.AreEqual(3, dictValues.Count);
-            Assert.AreEqual(5, dictValues["X"]);
-            Assert.AreEqual(10, dictValues["Y"]);
-            Assert.AreEqual(17, dictValues["Z"]);
+            Assert2.NotNull(dictValues);
+            Assert2.Equal(3, dictValues.Count);
+            Assert2.Equal(5, dictValues["X"]);
+            Assert2.Equal(10, dictValues["Y"]);
+            Assert2.Equal(17, dictValues["Z"]);
         }
 
         private class Point

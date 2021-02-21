@@ -22,9 +22,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.AreSame(model, result);
+            Assert2.Same(model, result);
         }
 
         [TestMethod]
@@ -39,8 +39,8 @@ namespace Microsoft.Extensions.Internal.Tests
             var func2 = CachedExpressionCompiler.Process(expression2);
 
             // Assert
-            Assert.IsNotNull(func1);
-            Assert.AreSame(func1, func2);
+            Assert2.NotNull(func1);
+            Assert2.Same(func1, func2);
         }
 
         [TestMethod]
@@ -55,9 +55,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.AreSame(differentModel, result);
+            Assert2.Same(differentModel, result);
         }
 
         [TestMethod]
@@ -71,9 +71,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -87,9 +87,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(null);
-            Assert.AreSame(differentModel, result);
+            Assert2.Same(differentModel, result);
         }
 
         [TestMethod]
@@ -106,14 +106,14 @@ namespace Microsoft.Extensions.Internal.Tests
 
             // Assert - 1
             var result1 = func1(null);
-            Assert.AreSame(differentModel, result1);
+            Assert2.Same(differentModel, result1);
 
             // Act - 2
             var func2 = CachedExpressionCompiler.Process(expression2);
 
             // Assert - 2
             var result2 = func1(null);
-            Assert.AreSame(differentModel, result2);
+            Assert2.Same(differentModel, result2);
         }
 
         [TestMethod]
@@ -129,7 +129,7 @@ namespace Microsoft.Extensions.Internal.Tests
 
             // Assert - 1
             var result1 = func(null);
-            Assert.AreSame(differentModel, result1);
+            Assert2.Same(differentModel, result1);
 
             // Act - 2
             differentModel = new DifferentModel();
@@ -137,7 +137,7 @@ namespace Microsoft.Extensions.Internal.Tests
             // Assert - 2
             var result2 = func(null);
             Assert2.NotSame(differentModel, result1);
-            Assert.AreSame(differentModel, result2);
+            Assert2.Same(differentModel, result2);
         }
 
         [TestMethod]
@@ -151,7 +151,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(10, result);
         }
@@ -167,7 +167,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal("StaticValue", result);
         }
@@ -184,8 +184,8 @@ namespace Microsoft.Extensions.Internal.Tests
             var func2 = CachedExpressionCompiler.Process(expression2);
 
             // Assert
-            Assert.IsNotNull(func1);
-            Assert.AreSame(func1, func2);
+            Assert2.NotNull(func1);
+            Assert2.Same(func1, func2);
         }
 
         [TestMethod]
@@ -201,7 +201,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(expected, result);
         }
@@ -218,8 +218,8 @@ namespace Microsoft.Extensions.Internal.Tests
             var func2 = CachedExpressionCompiler.Process(expression2);
 
             // Assert
-            Assert.IsNotNull(func1);
-            Assert.AreSame(func1, func2);
+            Assert2.NotNull(func1);
+            Assert2.Same(func1, func2);
         }
 
         [TestMethod]
@@ -234,7 +234,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(null);
             Assert2.Equal(expected, result);
         }
@@ -250,7 +250,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(10, result);
         }
@@ -265,7 +265,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(null);
             Assert2.Equal(10, result);
         }
@@ -281,7 +281,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal("Test", result);
         }
@@ -298,8 +298,8 @@ namespace Microsoft.Extensions.Internal.Tests
             var func2 = CachedExpressionCompiler.Process(expression2);
 
             // Assert
-            Assert.IsNotNull(func1);
-            Assert.AreSame(func1, func2);
+            Assert2.NotNull(func1);
+            Assert2.Same(func1, func2);
         }
 
         [TestMethod]
@@ -313,7 +313,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(12, result);
         }
@@ -329,9 +329,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -345,9 +345,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -361,7 +361,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(7, result);
         }
@@ -377,9 +377,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -393,7 +393,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(7, result);
         }
@@ -409,7 +409,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(model.Id, result);
         }
@@ -425,7 +425,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(2000, result);
         }
@@ -441,7 +441,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(1, result);
         }
@@ -458,7 +458,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(nullableModel);
             Assert2.Equal(model, result);
         }
@@ -474,9 +474,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(nullableModel);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -491,7 +491,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(2000, result);
         }
@@ -507,9 +507,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -524,7 +524,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(expected, result);
         }
@@ -541,8 +541,8 @@ namespace Microsoft.Extensions.Internal.Tests
             var func2 = CachedExpressionCompiler.Process(expression2);
 
             // Assert
-            Assert.IsNotNull(func1);
-            Assert.AreSame(func1, func2);
+            Assert2.NotNull(func1);
+            Assert2.Same(func1, func2);
         }
 
         [TestMethod]
@@ -557,8 +557,8 @@ namespace Microsoft.Extensions.Internal.Tests
             var func2 = CachedExpressionCompiler.Process(expression2);
 
             // Assert
-            Assert.IsNotNull(func1);
-            Assert.AreSame(func1, func2);
+            Assert2.NotNull(func1);
+            Assert2.Same(func1, func2);
         }
 
         [TestMethod]
@@ -583,7 +583,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(expected, result);
         }
@@ -606,9 +606,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -627,9 +627,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -654,7 +654,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(expected, result);
         }
@@ -677,9 +677,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -693,9 +693,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -709,9 +709,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -729,7 +729,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(expected, result);
         }
@@ -749,7 +749,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(expected, result);
         }
@@ -769,7 +769,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
             Assert2.Equal(expected, result);
         }
@@ -785,9 +785,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -801,9 +801,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.IsNull(result);
+            Assert2.Null(result);
         }
 
         [TestMethod]
@@ -817,7 +817,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNull(func);
+            Assert2.Null(func);
         }
 
         [TestMethod]
@@ -832,9 +832,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.AreSame(differentModel, result);
+            Assert2.Same(differentModel, result);
         }
 
         [TestMethod]
@@ -849,9 +849,9 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNotNull(func);
+            Assert2.NotNull(func);
             var result = func(model);
-            Assert.AreSame(differentModel, result);
+            Assert2.Same(differentModel, result);
         }
 
         [TestMethod]
@@ -865,7 +865,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNull(func);
+            Assert2.Null(func);
         }
 
         [TestMethod]
@@ -880,7 +880,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNull(func);
+            Assert2.Null(func);
         }
 
         [TestMethod]
@@ -893,7 +893,7 @@ namespace Microsoft.Extensions.Internal.Tests
             var func = CachedExpressionCompiler.Process(expression);
 
             // Assert
-            Assert.IsNull(func);
+            Assert2.Null(func);
         }
 
         private static Expression<Func<TModel, TResult>> GetExpression<TModel, TResult>(Expression<Func<TModel, TResult>> expression)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Tup.Utilities;
 
@@ -11,10 +12,21 @@ namespace Microsoft.VisualStudio.TestTools.UnitTesting
     /// </summary>
     public static class Assert2
     {
+        public static void True(bool value)
+        {
+            Assert.IsTrue(value);
+        }
+
+        public static void False(bool value)
+        {
+            Assert.IsFalse(value);
+        }
+
         public static void NotNull(object value)
         {
             Assert.IsNotNull(value);
         }
+
         public static void Null(object value)
         {
             Assert.IsNull(value);
@@ -154,6 +166,16 @@ namespace Microsoft.VisualStudio.TestTools.UnitTesting
         public static T Throws<T>(Action action, string message) where T : Exception
         {
             return Assert.ThrowsException<T>(action, message);
+        }
+
+        public static Task<T> ThrowsAsync<T>(Func<Task> action) where T : Exception
+        {
+            return Assert.ThrowsExceptionAsync<T>(action);
+        }
+
+        public static Task<T> ThrowsAsync<T>(Func<Task> action, string message) where T : Exception
+        {
+            return Assert.ThrowsExceptionAsync<T>(action, message);
         }
     }
 

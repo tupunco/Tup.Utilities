@@ -18,57 +18,57 @@ namespace Microsoft.Extensions.Internal.Tests
         [TestMethod]
         public void ExecuteValueMethod()
         {
-            var executor = GetExecutorForMethod("ValueMethod");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueMethod));
             var result = executor.Execute(
                 _targetObject,
                 new object[] { 10, 20 });
-            Assert.IsFalse(executor.IsMethodAsync);
-            Assert.AreEqual(30, (int)result);
+            Assert2.False(executor.IsMethodAsync);
+            Assert2.Equal(30, (int)result);
         }
 
         [TestMethod]
         public void ExecuteVoidValueMethod()
         {
-            var executor = GetExecutorForMethod("VoidValueMethod");
+            var executor = GetExecutorForMethod(nameof(TestObject.VoidValueMethod));
             var result = executor.Execute(
                 _targetObject,
                 new object[] { 10 });
-            Assert.IsFalse(executor.IsMethodAsync);
-            Assert.IsNull(result);
+            Assert2.False(executor.IsMethodAsync);
+            Assert2.Null(result);
         }
 
         [TestMethod]
         public void ExecuteValueMethodWithReturnType()
         {
-            var executor = GetExecutorForMethod("ValueMethodWithReturnType");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueMethodWithReturnType));
             var result = executor.Execute(
                 _targetObject,
                 new object[] { 10 });
             var resultObject = Assert2.IsType<TestObject>(result);
-            Assert.IsFalse(executor.IsMethodAsync);
-            Assert.AreEqual("Hello", resultObject.value);
+            Assert2.False(executor.IsMethodAsync);
+            Assert2.Equal("Hello", resultObject.value);
         }
 
         [TestMethod]
         public void ExecuteValueMethodUpdateValue()
         {
-            var executor = GetExecutorForMethod("ValueMethodUpdateValue");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueMethodUpdateValue));
             var parameter = new TestObject();
             var result = executor.Execute(
                 _targetObject,
                 new object[] { parameter });
             var resultObject = Assert2.IsType<TestObject>(result);
-            Assert.IsFalse(executor.IsMethodAsync);
-            Assert.AreEqual("HelloWorld", resultObject.value);
+            Assert2.False(executor.IsMethodAsync);
+            Assert2.Equal("HelloWorld", resultObject.value);
         }
 
         [TestMethod]
         public void ExecuteValueMethodWithReturnTypeThrowsException()
         {
-            var executor = GetExecutorForMethod("ValueMethodWithReturnTypeThrowsException");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueMethodWithReturnTypeThrowsException));
             var parameter = new TestObject();
-            Assert.IsFalse(executor.IsMethodAsync);
-            Assert.ThrowsException<NotImplementedException>(
+            Assert2.False(executor.IsMethodAsync);
+            Assert2.Throws<NotImplementedException>(
                         () => executor.Execute(
                             _targetObject,
                             new object[] { parameter }));
@@ -77,46 +77,46 @@ namespace Microsoft.Extensions.Internal.Tests
         [TestMethod]
         public async Task ExecuteValueMethodAsync()
         {
-            var executor = GetExecutorForMethod("ValueMethodAsync");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueMethodAsync));
             var result = await executor.ExecuteAsync(
                 _targetObject,
                 new object[] { 10, 20 });
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreEqual(30, (int)result);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Equal(30, (int)result);
         }
 
         [TestMethod]
         public async Task ExecuteValueMethodWithReturnTypeAsync()
         {
-            var executor = GetExecutorForMethod("ValueMethodWithReturnTypeAsync");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueMethodWithReturnTypeAsync));
             var result = await executor.ExecuteAsync(
                 _targetObject,
                 new object[] { 10 });
             var resultObject = Assert2.IsType<TestObject>(result);
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreEqual("Hello", resultObject.value);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Equal("Hello", resultObject.value);
         }
 
         [TestMethod]
         public async Task ExecuteValueMethodUpdateValueAsync()
         {
-            var executor = GetExecutorForMethod("ValueMethodUpdateValueAsync");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueMethodUpdateValueAsync));
             var parameter = new TestObject();
             var result = await executor.ExecuteAsync(
                 _targetObject,
                 new object[] { parameter });
             var resultObject = Assert2.IsType<TestObject>(result);
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreEqual("HelloWorld", resultObject.value);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Equal("HelloWorld", resultObject.value);
         }
 
         [TestMethod]
         public async Task ExecuteValueMethodWithReturnTypeThrowsExceptionAsync()
         {
-            var executor = GetExecutorForMethod("ValueMethodWithReturnTypeThrowsExceptionAsync");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueMethodWithReturnTypeThrowsExceptionAsync));
             var parameter = new TestObject();
-            Assert.IsTrue(executor.IsMethodAsync);
-            await Assert.ThrowsExceptionAsync<NotImplementedException>(
+            Assert2.True(executor.IsMethodAsync);
+            await Assert2.ThrowsAsync<NotImplementedException>(
                     async () => await executor.ExecuteAsync(
                             _targetObject,
                             new object[] { parameter }));
@@ -125,10 +125,10 @@ namespace Microsoft.Extensions.Internal.Tests
         [TestMethod]
         public async Task ExecuteValueMethodWithReturnVoidThrowsExceptionAsync()
         {
-            var executor = GetExecutorForMethod("ValueMethodWithReturnVoidThrowsExceptionAsync");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueMethodWithReturnVoidThrowsExceptionAsync));
             var parameter = new TestObject();
-            Assert.IsTrue(executor.IsMethodAsync);
-            await Assert.ThrowsExceptionAsync<NotImplementedException>(
+            Assert2.True(executor.IsMethodAsync);
+            await Assert2.ThrowsAsync<NotImplementedException>(
                     async () => await executor.ExecuteAsync(
                             _targetObject,
                             new object[] { parameter }));
@@ -138,195 +138,195 @@ namespace Microsoft.Extensions.Internal.Tests
         public void GetDefaultValueForParameters_ReturnsSuppliedValues()
         {
             var suppliedDefaultValues = new object[] { 123, "test value" };
-            var executor = GetExecutorForMethod("MethodWithMultipleParameters", suppliedDefaultValues);
-            Assert.AreEqual(suppliedDefaultValues[0], executor.GetDefaultValueForParameter(0));
-            Assert.AreEqual(suppliedDefaultValues[1], executor.GetDefaultValueForParameter(1));
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => executor.GetDefaultValueForParameter(2));
+            var executor = GetExecutorForMethod(nameof(TestObject.MethodWithMultipleParameters), suppliedDefaultValues);
+            Assert2.Equal(suppliedDefaultValues[0], executor.GetDefaultValueForParameter(0));
+            Assert2.Equal(suppliedDefaultValues[1], executor.GetDefaultValueForParameter(1));
+            Assert2.Throws<ArgumentOutOfRangeException>(() => executor.GetDefaultValueForParameter(2));
         }
 
         [TestMethod]
         public void GetDefaultValueForParameters_ThrowsIfNoneWereSupplied()
         {
-            var executor = GetExecutorForMethod("MethodWithMultipleParameters");
-            Assert.ThrowsException<InvalidOperationException>(() => executor.GetDefaultValueForParameter(0));
+            var executor = GetExecutorForMethod(nameof(TestObject.MethodWithMultipleParameters));
+            Assert2.Throws<InvalidOperationException>(() => executor.GetDefaultValueForParameter(0));
         }
 
         [TestMethod]
         public async Task TargetMethodReturningCustomAwaitableOfReferenceType_CanInvokeViaExecute()
         {
             // Arrange
-            var executor = GetExecutorForMethod("CustomAwaitableOfReferenceTypeAsync");
+            var executor = GetExecutorForMethod(nameof(TestObject.CustomAwaitableOfReferenceTypeAsync));
 
             // Act
             var result = await (TestAwaitable<TestObject>)executor.Execute(_targetObject, new object[] { "Hello", 123 });
 
             // Assert
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreSame(typeof(TestObject), executor.AsyncResultType);
-            Assert.IsNotNull(result);
-            Assert.AreEqual("Hello 123", result.value);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Same(typeof(TestObject), executor.AsyncResultType);
+            Assert2.NotNull(result);
+            Assert2.Equal("Hello 123", result.value);
         }
 
         [TestMethod]
         public async Task TargetMethodReturningCustomAwaitableOfValueType_CanInvokeViaExecute()
         {
             // Arrange
-            var executor = GetExecutorForMethod("CustomAwaitableOfValueTypeAsync");
+            var executor = GetExecutorForMethod(nameof(TestObject.CustomAwaitableOfValueTypeAsync));
 
             // Act
             var result = await (TestAwaitable<int>)executor.Execute(_targetObject, new object[] { 123, 456 });
 
             // Assert
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreSame(typeof(int), executor.AsyncResultType);
-            Assert.AreEqual(579, result);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Same(typeof(int), executor.AsyncResultType);
+            Assert2.Equal(579, result);
         }
 
         [TestMethod]
         public async Task TargetMethodReturningCustomAwaitableOfReferenceType_CanInvokeViaExecuteAsync()
         {
             // Arrange
-            var executor = GetExecutorForMethod("CustomAwaitableOfReferenceTypeAsync");
+            var executor = GetExecutorForMethod(nameof(TestObject.CustomAwaitableOfReferenceTypeAsync));
 
             // Act
             var result = await executor.ExecuteAsync(_targetObject, new object[] { "Hello", 123 });
 
             // Assert
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreSame(typeof(TestObject), executor.AsyncResultType);
-            Assert.IsNotNull(result);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Same(typeof(TestObject), executor.AsyncResultType);
+            Assert2.NotNull(result);
             Assert2.IsType<TestObject>(result);
-            Assert.AreEqual("Hello 123", ((TestObject)result).value);
+            Assert2.Equal("Hello 123", ((TestObject)result).value);
         }
 
         [TestMethod]
         public async Task TargetMethodReturningCustomAwaitableOfValueType_CanInvokeViaExecuteAsync()
         {
             // Arrange
-            var executor = GetExecutorForMethod("CustomAwaitableOfValueTypeAsync");
+            var executor = GetExecutorForMethod(nameof(TestObject.CustomAwaitableOfValueTypeAsync));
 
             // Act
             var result = await executor.ExecuteAsync(_targetObject, new object[] { 123, 456 });
 
             // Assert
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreSame(typeof(int), executor.AsyncResultType);
-            Assert.IsNotNull(result);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Same(typeof(int), executor.AsyncResultType);
+            Assert2.NotNull(result);
             Assert2.IsType<int>(result);
-            Assert.AreEqual(579, (int)result);
+            Assert2.Equal(579, (int)result);
         }
 
         [TestMethod]
         public async Task TargetMethodReturningAwaitableOfVoidType_CanInvokeViaExecuteAsync()
         {
             // Arrange
-            var executor = GetExecutorForMethod("VoidValueMethodAsync");
+            var executor = GetExecutorForMethod(nameof(TestObject.VoidValueMethodAsync));
 
             // Act
             var result = await executor.ExecuteAsync(_targetObject, new object[] { 123 });
 
             // Assert
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreSame(typeof(void), executor.AsyncResultType);
-            Assert.IsNull(result);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Same(typeof(void), executor.AsyncResultType);
+            Assert2.Null(result);
         }
 
         [TestMethod]
         public async Task TargetMethodReturningAwaitableWithICriticalNotifyCompletion_UsesUnsafeOnCompleted()
         {
             // Arrange
-            var executor = GetExecutorForMethod("CustomAwaitableWithICriticalNotifyCompletion");
+            var executor = GetExecutorForMethod(nameof(TestObject.CustomAwaitableWithICriticalNotifyCompletion));
 
             // Act
             var result = await executor.ExecuteAsync(_targetObject, new object[0]);
 
             // Assert
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreSame(typeof(string), executor.AsyncResultType);
-            Assert.AreEqual("Used UnsafeOnCompleted", (string)result);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Same(typeof(string), executor.AsyncResultType);
+            Assert2.Equal("Used UnsafeOnCompleted", (string)result);
         }
 
         [TestMethod]
         public async Task TargetMethodReturningAwaitableWithoutICriticalNotifyCompletion_UsesOnCompleted()
         {
             // Arrange
-            var executor = GetExecutorForMethod("CustomAwaitableWithoutICriticalNotifyCompletion");
+            var executor = GetExecutorForMethod(nameof(TestObject.CustomAwaitableWithoutICriticalNotifyCompletion));
 
             // Act
             var result = await executor.ExecuteAsync(_targetObject, new object[0]);
 
             // Assert
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreSame(typeof(string), executor.AsyncResultType);
-            Assert.AreEqual("Used OnCompleted", (string)result);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Same(typeof(string), executor.AsyncResultType);
+            Assert2.Equal("Used OnCompleted", (string)result);
         }
 
         [TestMethod]
         public async Task TargetMethodReturningValueTaskOfValueType_CanBeInvokedViaExecute()
         {
             // Arrange
-            var executor = GetExecutorForMethod("ValueTaskOfValueType");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueTaskOfValueType));
 
             // Act
             var result = await (ValueTask<int>)executor.Execute(_targetObject, new object[] { 123 });
 
             // Assert
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreSame(typeof(int), executor.AsyncResultType);
-            Assert.AreEqual(123, result);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Same(typeof(int), executor.AsyncResultType);
+            Assert2.Equal(123, result);
         }
 
         [TestMethod]
         public async Task TargetMethodReturningValueTaskOfReferenceType_CanBeInvokedViaExecute()
         {
             // Arrange
-            var executor = GetExecutorForMethod("ValueTaskOfReferenceType");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueTaskOfReferenceType));
 
             // Act
             var result = await (ValueTask<string>)executor.Execute(_targetObject, new object[] { "test result" });
 
             // Assert
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreSame(typeof(string), executor.AsyncResultType);
-            Assert.AreEqual("test result", result);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Same(typeof(string), executor.AsyncResultType);
+            Assert2.Equal("test result", result);
         }
 
         [TestMethod]
         public async Task TargetMethodReturningValueTaskOfValueType_CanBeInvokedViaExecuteAsync()
         {
             // Arrange
-            var executor = GetExecutorForMethod("ValueTaskOfValueType");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueTaskOfValueType));
 
             // Act
             var result = await executor.ExecuteAsync(_targetObject, new object[] { 123 });
 
             // Assert
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreSame(typeof(int), executor.AsyncResultType);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(123, (int)result);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Same(typeof(int), executor.AsyncResultType);
+            Assert2.NotNull(result);
+            Assert2.Equal(123, (int)result);
         }
 
         [TestMethod]
         public async Task TargetMethodReturningValueTaskOfReferenceType_CanBeInvokedViaExecuteAsync()
         {
             // Arrange
-            var executor = GetExecutorForMethod("ValueTaskOfReferenceType");
+            var executor = GetExecutorForMethod(nameof(TestObject.ValueTaskOfReferenceType));
 
             // Act
             var result = await executor.ExecuteAsync(_targetObject, new object[] { "test result" });
 
             // Assert
-            Assert.IsTrue(executor.IsMethodAsync);
-            Assert.AreSame(typeof(string), executor.AsyncResultType);
-            Assert.AreEqual("test result", result);
+            Assert2.True(executor.IsMethodAsync);
+            Assert2.Same(typeof(string), executor.AsyncResultType);
+            Assert2.Equal("test result", result);
         }
 
         //[TestMethod]
         //public async Task TargetMethodReturningFSharpAsync_CanBeInvokedViaExecute()
         //{
         //    // Arrange
-        //    var executor = GetExecutorForMethod("FSharpAsyncMethod");
+        //    var executor = GetExecutorForMethod(nameof(TestObject.FSharpAsyncMethod));
 
         //    // Act
         //    var fsharpAsync = (FSharpAsync<string>)executor.Execute(_targetObject, new object[] { "test result" });
@@ -335,16 +335,16 @@ namespace Microsoft.Extensions.Internal.Tests
         //        FSharpOption<CancellationToken>.None);
 
         //    // Assert
-        //    Assert.IsTrue(executor.IsMethodAsync);
-        //    Assert.AreSame(typeof(string), executor.AsyncResultType);
-        //    Assert.AreEqual("test result", result);
+        //    Assert2.True(executor.IsMethodAsync);
+        //    Assert2.Same(typeof(string), executor.AsyncResultType);
+        //    Assert2.Equal("test result", result);
         //}
 
         //[TestMethod]
         //public async Task TargetMethodReturningFailingFSharpAsync_CanBeInvokedViaExecute()
         //{
         //    // Arrange
-        //    var executor = GetExecutorForMethod("FSharpAsyncFailureMethod");
+        //    var executor = GetExecutorForMethod(nameof(TestObject.FSharpAsyncFailureMethod));
 
         //    // Act
         //    var fsharpAsync = (FSharpAsync<string>)executor.Execute(_targetObject, new object[] { "test result" });
@@ -353,45 +353,45 @@ namespace Microsoft.Extensions.Internal.Tests
         //        FSharpOption<CancellationToken>.None);
 
         //    // Assert
-        //    Assert.IsTrue(executor.IsMethodAsync);
-        //    Assert.AreSame(typeof(string), executor.AsyncResultType);
+        //    Assert2.True(executor.IsMethodAsync);
+        //    Assert2.Same(typeof(string), executor.AsyncResultType);
 
-        //    var exception = await Assert.ThrowsExceptionAsync<AggregateException>(async () => await resultTask);
+        //    var exception = await Assert2.ThrowsAsync<AggregateException>(async () => await resultTask);
         //    Assert2.IsType<InvalidOperationException>(exception.InnerException);
-        //    Assert.AreEqual("Test exception", exception.InnerException.Message);
+        //    Assert2.Equal("Test exception", exception.InnerException.Message);
         //}
 
         //[TestMethod]
         //public async Task TargetMethodReturningFSharpAsync_CanBeInvokedViaExecuteAsync()
         //{
         //    // Arrange
-        //    var executor = GetExecutorForMethod("FSharpAsyncMethod");
+        //    var executor = GetExecutorForMethod(nameof(TestObject.FSharpAsyncMethod));
 
         //    // Act
         //    var result = await executor.ExecuteAsync(_targetObject, new object[] { "test result" });
 
         //    // Assert
-        //    Assert.IsTrue(executor.IsMethodAsync);
-        //    Assert.AreSame(typeof(string), executor.AsyncResultType);
-        //    Assert.AreEqual("test result", result);
+        //    Assert2.True(executor.IsMethodAsync);
+        //    Assert2.Same(typeof(string), executor.AsyncResultType);
+        //    Assert2.Equal("test result", result);
         //}
 
         //[TestMethod]
         //public async Task TargetMethodReturningFailingFSharpAsync_CanBeInvokedViaExecuteAsync()
         //{
         //    // Arrange
-        //    var executor = GetExecutorForMethod("FSharpAsyncFailureMethod");
+        //    var executor = GetExecutorForMethod(nameof(TestObject.FSharpAsyncFailureMethod));
 
         //    // Act
         //    var resultTask = executor.ExecuteAsync(_targetObject, new object[] { "test result" });
 
         //    // Assert
-        //    Assert.IsTrue(executor.IsMethodAsync);
-        //    Assert.AreSame(typeof(string), executor.AsyncResultType);
+        //    Assert2.True(executor.IsMethodAsync);
+        //    Assert2.Same(typeof(string), executor.AsyncResultType);
 
-        //    var exception = await Assert.ThrowsExceptionAsync<AggregateException>(async () => await resultTask);
+        //    var exception = await Assert2.ThrowsAsync<AggregateException>(async () => await resultTask);
         //    Assert2.IsType<InvalidOperationException>(exception.InnerException);
-        //    Assert.AreEqual("Test exception", exception.InnerException.Message);
+        //    Assert2.Equal("Test exception", exception.InnerException.Message);
         //}
 
         #region 基础数据
@@ -426,7 +426,7 @@ namespace Microsoft.Extensions.Internal.Tests
 
             public TestObject ValueMethodWithReturnType(int i)
             {
-                return new TestObject() { value = "Hello" }; ;
+                return new TestObject() { value = "Hello" };
             }
 
             public TestObject ValueMethodWithReturnTypeThrowsException(TestObject i)
